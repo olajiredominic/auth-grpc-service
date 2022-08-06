@@ -9,12 +9,13 @@ ENV APP_HOME /go/src/app
 RUN mkdir -p "$APP_HOME"
 
 WORKDIR "$APP_HOME"
-# COPY go.mod WORKDIR
-# COPY go.sum WORKDIR
+COPY go.mod /go/src/app
+COPY go.sum /go/src/app
+RUN go mod download
 
 COPY ./ /go/src/app
-RUN go mod download
 WORKDIR "$APP_HOME/cmd"
+
 EXPOSE 5001
 CMD ["bee", "run"]
 # ENTRYPOINT "bee run"
