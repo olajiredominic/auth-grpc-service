@@ -1,0 +1,65 @@
+syntax = "proto3";
+
+package auth;
+
+import "google/protobuf/empty.proto";
+
+
+option go_package = "pkg/pb";
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service AuthService {
+
+  rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
+
+  rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {}
+
+  rpc ForgotPassword(ForgotPasswordRequest) returns (google.protobuf.Empty) {}
+
+  rpc ResetPassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {}
+
+  rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
+}
+
+message LoginUserRequest {
+  // The Login Id
+  string LoginId = 1;
+  // The Password
+  optional string Password = 2;
+}
+
+
+message LoginUserResponse {
+  // Generic response used by all
+  string Token = 1;
+  string Message = 2;
+  string Error = 3;
+}
+
+
+message ChangePasswordRequest {
+  // The field will contain name of the resource requested.
+  string Id = 1;
+  string Oldpassword = 2;
+  string Newpassword = 3;
+}
+
+message ForgotPasswordRequest {
+  // The field will contain name of the resource requested.
+  string LoginId = 1;
+}
+
+
+
+message UpdatePasswordRequest {
+  // Updates an auth account with new password
+  string LoginId = 1;
+  string Token = 2;
+  string Password = 3;
+}
+
+message HasPermissionRequest {
+  // Checks an ID has a certain permission
+  string Id = 1;
+  string Permission = 2;
+}

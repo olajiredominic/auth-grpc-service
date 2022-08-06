@@ -1,0 +1,21 @@
+version: "3.9"
+services:
+  web:
+    build: .
+    ports:
+      - "5001:5001"
+    links:
+      - db
+    volumes:
+      - ./src:/go/src/app/src
+  db:
+    container_name: postgresdb
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 12233e23e232e23e
+      POSTGRES_USER: postgres
+      POSTGRES_DB: users
+    volumes:
+      - ./data:/data/db
+    ports:
+      - '5432:5432'

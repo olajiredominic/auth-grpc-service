@@ -1,0 +1,6 @@
+{
+  "makefile.extensionOutputFolder": "./.vscode",
+  "go.toolsEnvVars": {
+    "GOPATH": "/Users/user/go"
+  }
+}
