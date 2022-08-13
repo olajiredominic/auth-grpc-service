@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Wed Jul 27 12:11:24 2022
+# Make data base, printed on Sat Aug 13 11:56:51 2022
 
 # Variables
 
@@ -40,7 +40,7 @@ VSCODE_VERBOSE_LOGGING = true
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
-VSCODE_IPC_HOOK_EXTHOST = /var/folders/m1/b4g20h5x0bz9_vf7xdd1fn9w0000gn/T/vscode-ipc-afb3d0e7-3280-4d09-a4f8-36705ce2dc99.sock
+VSCODE_IPC_HOOK_EXTHOST = /var/folders/m1/b4g20h5x0bz9_vf7xdd1fn9w0000gn/T/vscode-ipc-ed6cf04d-d310-48e1-8f9c-e2bc47782ce0.sock
 # environment
 VSCODE_CWD = /
 # environment
@@ -50,8 +50,6 @@ PATH = /usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/go/bin:/usr/local
 # environment
 GOPATH = /Users/user/go
 # environment
-LaunchInstanceID = 75A7FABF-8767-4E64-8780-DAD311A0B6AE
-# environment
 VSCODE_LOG_STACK = false
 # environment
 ELECTRON_RUN_AS_NODE = 1
@@ -60,7 +58,7 @@ ELECTRON_RUN_AS_NODE = 1
 # environment
 CLOUDSDK_METRICS_ENVIRONMENT = cloudcode.vscode
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.URfFOZhrJx/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.7Iuf4b2CB3/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -135,8 +133,6 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
-# environment
-SECURITYSESSIONID = 186a7
 # automatic
 ^F = $(notdir $^)
 # default
@@ -148,9 +144,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 365
+VSCODE_PID = 2911
 # variable set hash-table stats:
-# Load=69/1024=7%, Rehash=0, Collisions=2/93=2%
+# Load=67/1024=7%, Rehash=0, Collisions=2/91=2%
 
 # Pattern-specific Variable Values
 
@@ -158,9 +154,9 @@ VSCODE_PID = 365
 
 # Directories
 
-# . (device 16777220, inode 14233939): 12 files, no impossibilities.
+# . (device 16777220, inode 14233939): 14 files, no impossibilities.
 
-# 12 files, no impossibilities in 1 directories.
+# 14 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -186,7 +182,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-07-23 16:41:11
+#  Last modified 2022-08-01 10:45:46
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -205,7 +201,7 @@ proto:
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 2):
-	protoc ./pkg/pb/*.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
+	protoc ./pkg/pb/auth.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
 	
 
 # Not a target:
@@ -235,7 +231,7 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Jul 27 12:11:24 2022
+# Finished Make data base on Sat Aug 13 11:56:51 2022
 
  
 make: *** No rule to make target `all'.  Stop.
