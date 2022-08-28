@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "pkg/pb";
+
+service TestService{
+  rpc SayingHello(SayingHelloRequest) returns (SayingHelloResponse) {}
+}
+
+
+message SayingHelloRequest {
+  string Name = 1;
+}
+
+message SayingHelloResponse {
+  string Response = 1;
+}

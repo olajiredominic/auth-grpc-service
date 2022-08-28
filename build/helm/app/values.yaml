@@ -7,7 +7,7 @@ containerPort: 5432
 replicaCount: 1
 
 image:
-  repository: auth_db
+  repository: auth_app
   # repository: 845934506508.dkr.ecr.us-east-1.amazonaws.com/ch-backend-auth
   pullPolicy: Never
   # Overrides the image tag whose default is the chart appVersion.
@@ -41,12 +41,12 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: ClusterIP
+  type: LoadBalancer
   port: 5432
   targetPort: 5432
 
 ingress:
-  enabled: true
+  enabled: false
   className: ""
   annotations:
     kubernetes.io/ingress.class: alb

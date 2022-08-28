@@ -44,14 +44,14 @@ spec:
                 - -d
                 - '{"Name": "Jireh"}'
                 - -plaintext
-                - localhost:5001
+                - localhost:5432
                 - TestService/SayingHello
             initialDelaySeconds: 60
           readinessProbe:
             exec:
               command:
               - grpc_health_probe
-              - -addr=:5001
+              - -addr=:5432
             initialDelaySeconds: 60
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

@@ -26,7 +26,7 @@ require (
 	github.com/jackc/pgx/v4 v4.16.1 // indirect
 	github.com/jinzhu/now v1.1.4 // indirect
 	github.com/lib/pq v1.10.2 // indirect
-	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2 // indirect
+	golang.org/x/net v0.0.0-20220520000938-2e3eb7b945c2
 )
 
 require (

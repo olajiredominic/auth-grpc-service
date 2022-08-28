@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 
@@ -9,6 +10,7 @@ import (
 	"cityhotels.com/backend-auth/pkg/routes"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 func main() {
@@ -24,11 +26,17 @@ func main() {
 		log.Fatalln("Failed to serve:", err)
 	}
 
-	handler := routes.Init(config.DBUrl)
+	dbUrl := fmt.Sprintf("postgres://%s:%s@%s", config.DBUSER, config.DBPWD, config.DBURL)
+	fmt.Printf("Database Url", dbUrl)
+	handler := routes.Init(dbUrl)
 	h := routes.New(handler.DB)
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserServiceServer(grpcServer, &h)
+	pb.RegisterTestServiceServer(grpcServer, &h)
+	pb.RegisterHealthServer(grpcServer, &h)
+
+	reflection.Register(grpcServer)
 	// pb.RegisterRoomServiceServer(grpcServer, &s)
 
 	if err := grpcServer.Serve(lis); err != nil {

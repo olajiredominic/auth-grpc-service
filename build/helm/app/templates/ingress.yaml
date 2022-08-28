@@ -38,8 +38,8 @@ spec:
   {{- end }}
   rules:
     {{- range .Values.ingress.hosts }}
-    - host: {{ .host | quote }}
-      http:
+    # - host: {{ .host | quote }}
+    - http:
         paths:
           {{- range .paths }}
           - path: {{ .path }}
@@ -57,5 +57,5 @@ spec:
               servicePort: {{ $svcPort }}
               {{- end }}
           {{- end }}
-    {{- end }}
+    # {{- end }}
 {{- end }}
