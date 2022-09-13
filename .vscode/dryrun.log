@@ -1,5 +1,5 @@
 make --dry-run --always-make --keep-going --print-directory
 make: Entering directory `/Users/user/Desktop/CityHotels/backend/auth'
-protoc ./pkg/pb/*.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
+protoc ./pkg/pb/health*.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
 make: Leaving directory `/Users/user/Desktop/CityHotels/backend/auth'
  

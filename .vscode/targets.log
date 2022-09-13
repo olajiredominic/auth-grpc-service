@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Wed Aug 17 10:00:21 2022
+# Make data base, printed on Wed Sep  7 02:57:57 2022
 
 # Variables
 
@@ -44,15 +44,13 @@ PATH = /Users/user/Library/Application Support/cloud-code/installer/google-cloud
 # environment
 GOPATH = /Users/user/go
 # environment
-LaunchInstanceID = B5AB34AA-4B23-487E-9E74-3F7C57F502B6
-# environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
 CLOUDSDK_METRICS_ENVIRONMENT = cloudcode.vscode
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.lIWRKrQpwV/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.xeG0cVOYbb/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -68,11 +66,11 @@ HOME = /Users/user
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/6d9b74a70ca9c7733b29f0456fd8195364076dda
+VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/e4503b30fc78200f846c62cf8091b76ff5547662
 # environment
 LOGNAME = user
 # environment
-APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = true
+APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
 VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
@@ -102,7 +100,7 @@ TMPDIR = /var/folders/m1/b4g20h5x0bz9_vf7xdd1fn9w0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.70.1-main.sock
+VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.70.2-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -112,7 +110,7 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.15992607.15992613
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.17672222.17672228
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -127,8 +125,6 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
-# environment
-SECURITYSESSIONID = 186a7
 # automatic
 ^F = $(notdir $^)
 # default
@@ -140,9 +136,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 357
+VSCODE_PID = 18453
 # variable set hash-table stats:
-# Load=65/1024=6%, Rehash=0, Collisions=2/89=2%
+# Load=63/1024=6%, Rehash=0, Collisions=2/87=2%
 
 # Pattern-specific Variable Values
 
@@ -150,7 +146,7 @@ VSCODE_PID = 357
 
 # Directories
 
-# . (device 16777225, inode 14233939): 16 files, no impossibilities.
+# . (device 16777220, inode 14233939): 16 files, no impossibilities.
 
 # 16 files, no impossibilities in 1 directories.
 
@@ -178,7 +174,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-08-15 11:49:17
+#  Last modified 2022-08-18 00:20:27
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -197,7 +193,7 @@ proto:
 #  Modification time never checked.
 #  File has not been updated.
 #  commands to execute (from `Makefile', line 2):
-	protoc ./pkg/pb/*.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
+	protoc ./pkg/pb/health*.proto -I. --go_out=:.  --go-grpc_opt=require_unimplemented_servers=false  --go-grpc_out=:. --experimental_allow_proto3_optional
 	
 
 # Not a target:
@@ -227,7 +223,7 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Wed Aug 17 10:00:21 2022
+# Finished Make data base on Wed Sep  7 02:57:57 2022
 
  
 make: *** No rule to make target `all'.  Stop.

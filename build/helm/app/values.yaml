@@ -7,9 +7,9 @@ containerPort: 5432
 replicaCount: 1
 
 image:
-  repository: auth_app
-  # repository: 845934506508.dkr.ecr.us-east-1.amazonaws.com/ch-backend-auth
-  pullPolicy: Never
+  # repository: auth_app
+  repository: 845934506508.dkr.ecr.us-east-1.amazonaws.com/ch-backend-auth
+  pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
 
@@ -44,17 +44,21 @@ service:
   type: LoadBalancer
   port: 5432
   targetPort: 5432
+  nodePort: 31999
 
 ingress:
-  enabled: false
-  className: ""
+  enabled: true
+  className: "alb"
   annotations:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/backend-protocol-version: GRPC
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS": 443}]'
+    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:845934506508:certificate/c2763456-04ee-4a8c-b66c-479d64137b20
   hosts:
-    - host: chart-example.local
+    - host: api.cityhotelsandbookings.com
       paths:
-        - path: /auth/
+        - path: /auth
           pathType: ImplementationSpecific
   tls: []
   #  - secretName: chart-example-tls
