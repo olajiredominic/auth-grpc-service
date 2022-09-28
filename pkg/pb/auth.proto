@@ -19,6 +19,8 @@ service AuthService {
   rpc ResetPassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {}
 
   rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
+
+  rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty) { }
 }
 
 message LoginUserRequest {
@@ -62,4 +64,9 @@ message HasPermissionRequest {
   // Checks an ID has a certain permission
   string Id = 1;
   string Permission = 2;
+}
+
+message ValidateTokenRequest {
+  // Checks auth token is valid
+  string Token = 1;
 }

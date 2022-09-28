@@ -3,7 +3,7 @@ package routes
 import (
 	"log"
 
-	"cityhotels.com/backend-auth/pkg/pb"
+	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
 	"golang.org/x/net/context"
 )
 

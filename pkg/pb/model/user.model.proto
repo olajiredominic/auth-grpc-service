@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "pkg/pb/model";
+option go_package = "github.com/City-Hotels/ch-backend-auth/pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;

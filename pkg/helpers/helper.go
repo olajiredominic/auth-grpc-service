@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"cityhotels.com/backend-auth/pkg/config"
+	"github.com/City-Hotels/ch-backend-auth/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 )
 

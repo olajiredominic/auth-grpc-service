@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"cityhotels.com/backend-auth/pkg/helpers"
-	"cityhotels.com/backend-auth/pkg/pb"
-	models "cityhotels.com/backend-auth/pkg/pb/model"
+	"github.com/City-Hotels/ch-backend-auth/pkg/helpers"
+	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
+	models "github.com/City-Hotels/ch-backend-auth/pkg/pb/model"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"

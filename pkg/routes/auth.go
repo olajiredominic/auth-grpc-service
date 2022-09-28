@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"cityhotels.com/backend-auth/pkg/helpers"
-	"cityhotels.com/backend-auth/pkg/pb"
-	models "cityhotels.com/backend-auth/pkg/pb/model"
+	"github.com/City-Hotels/ch-backend-auth/pkg/helpers"
+	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
+	models "github.com/City-Hotels/ch-backend-auth/pkg/pb/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -61,6 +61,17 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 	user.Token = helpers.GetOTP(6)
 
 	h.DB.Save(user)
+
+	return &emptypb.Empty{}, nil
+}
+
+func (h *Handler) ValidateTokenRequest(ctx context.Context, req *pb.ValidateTokenRequest) (*emptypb.Empty, error) {
+
+	valid, error := helpers.ValidateJWTToken(req.Token)
+	if !valid || error != nil {
+		return nil, status.Errorf(codes.Unauthenticated,
+			"Invalid authentication token or expired")
+	}
 
 	return &emptypb.Empty{}, nil
 }
