@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.21.6
-// source: pkg/pb/auth.proto
+// source: pkg/pb/auth.service.proto
 
 package pb
 
@@ -28,7 +28,6 @@ type AuthServiceClient interface {
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ResetPassword(ctx context.Context, in *UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// TODO: Implement ValidateToken
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
@@ -103,7 +102,6 @@ type AuthServiceServer interface {
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*emptypb.Empty, error)
 	ResetPassword(context.Context, *UpdatePasswordRequest) (*emptypb.Empty, error)
 	HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error)
-	// TODO: Implement ValidateToken
 	ValidateToken(context.Context, *ValidateTokenRequest) (*emptypb.Empty, error)
 }
 
@@ -282,5 +280,5 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "pkg/pb/auth.proto",
+	Metadata: "pkg/pb/auth.service.proto",
 }
