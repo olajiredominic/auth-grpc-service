@@ -12,19 +12,19 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go install github.com/fullstorydev/grp
 FROM golang:1.18 AS builder
 ENV APP_HOME /go/src/app
 RUN mkdir -p "$APP_HOME"
-# WORKDIR /app/ch-backend-auth
+# WORKDIR /app/auth-grpc-service
 WORKDIR "$APP_HOME"
 # pre-copy/cache go.mod for pre-downloading dependencies and only redownloading them in subsequent builds if they change
 COPY go.mod ./
 RUN go mod download && go mod verify
 WORKDIR "$APP_HOME/cmd"
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /ch-backend-auth ./cmd
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /auth-grpc-service ./cmd
 
 
 FROM alpine:3.9
 COPY --from=grpc-health-probe-builder /bin/grpc_health_probe /usr/local/bin/
 COPY --from=grpcurl-builder /go/bin/grpcurl /usr/local/bin/
-COPY --from=builder /ch-backend-auth /ch-backend-auth
+COPY --from=builder /auth-grpc-service /auth-grpc-service
 
-CMD ["/ch-backend-auth"]
+CMD ["/auth-grpc-service"]
