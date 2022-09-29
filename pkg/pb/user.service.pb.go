@@ -7,7 +7,7 @@
 package pb
 
 import (
-	model "github.com/City-Hotels/ch-backend-auth/pkg/pb/model"
+	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
