@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
+	"github.com/lerryjay/auth-grpc-service/pkg/pb"
 	"golang.org/x/net/context"
 )
 

@@ -1,4 +1,4 @@
-module github.com/City-Hotels/ch-backend-auth
+module github.com/lerryjay/auth-grpc-service
 
 go 1.19
 

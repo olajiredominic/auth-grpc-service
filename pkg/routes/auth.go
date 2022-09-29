@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/City-Hotels/ch-backend-auth/pkg/helpers"
-	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
-	models "github.com/City-Hotels/ch-backend-auth/pkg/pb/model"
+	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
+	"github.com/lerryjay/auth-grpc-service/pkg/pb"
+	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"

@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/City-Hotels/ch-backend-auth/pkg/config"
+	"github.com/lerryjay/auth-grpc-service/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 )
 

@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 
-	models "github.com/City-Hotels/ch-backend-auth/pkg/pb/model"
+	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	"gorm.io/driver/postgres"
 )
 

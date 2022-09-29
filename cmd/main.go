@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 
-	"github.com/City-Hotels/ch-backend-auth/pkg/config"
-	"github.com/City-Hotels/ch-backend-auth/pkg/pb"
-	"github.com/City-Hotels/ch-backend-auth/pkg/routes"
+	"github.com/lerryjay/auth-grpc-service/pkg/config"
+	"github.com/lerryjay/auth-grpc-service/pkg/pb"
+	"github.com/lerryjay/auth-grpc-service/pkg/routes"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
