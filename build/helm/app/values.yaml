@@ -8,7 +8,7 @@ replicaCount: 1
 
 image:
   # repository: auth_app
-  repository: 845934506508.dkr.ecr.us-east-1.amazonaws.com/auth-grpc-service
+  repository: greyy2/auth-grpc-service
   pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
@@ -41,13 +41,13 @@ securityContext: {}
   # runAsUser: 1000
 
 service:
-  type: LoadBalancer
+  type: ClusterIP
   port: 5432
   targetPort: 5432
   nodePort: 31999
 
 ingress:
-  enabled: true
+  enabled: false
   className: "alb"
   annotations:
     kubernetes.io/ingress.class: alb
@@ -82,7 +82,7 @@ autoscaling:
   minReplicas: 1
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
 
 nodeSelector: {}
 
