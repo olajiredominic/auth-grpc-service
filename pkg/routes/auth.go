@@ -65,7 +65,7 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ValidateTokenRequest(ctx context.Context, req *pb.ValidateTokenRequest) (*emptypb.Empty, error) {
+func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*emptypb.Empty, error) {
 
 	valid, error := helpers.ValidateJWTToken(req.Token)
 	if !valid || error != nil {

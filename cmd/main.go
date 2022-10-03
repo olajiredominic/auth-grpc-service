@@ -33,6 +33,7 @@ func main() {
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserServiceServer(grpcServer, &h)
+	pb.RegisterAuthServiceServer(grpcServer, &h)
 	pb.RegisterTestServiceServer(grpcServer, &h)
 	pb.RegisterHealthServer(grpcServer, &h)
 
