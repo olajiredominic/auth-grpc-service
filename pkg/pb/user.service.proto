@@ -15,7 +15,7 @@ service UserService {
 
   rpc GetUser(GetUserRequest) returns (User) { }
 
-  rpc CreateUser(CreateUserRequest) returns (User) { }
+  rpc CreateUser(User) returns (User) { }
 
   rpc UpdateUser(UpdateUserRequest) returns (User) {}
 
@@ -56,15 +56,6 @@ message ListUsersResponse {
 message GetUserRequest {
   // The field will contain name of the resource requested.
   string Id = 1;
-}
-
-message CreateUserRequest {
-  // The User id to use for this User.
-  optional string User_id = 1;
-
-  // The User resource to create.
-  // The field name should match the Noun in the method name.
-  User User = 2;
 }
 
 message UpdateUserRequest {

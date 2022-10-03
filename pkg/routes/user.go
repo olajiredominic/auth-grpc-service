@@ -14,18 +14,18 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*models.User, error) {
+func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.User, error) {
 
-	req.User.Id = uuid.New().String()
-	hashPassword, err := helpers.HashPassword(req.User.Password)
+	req.Id = uuid.New().String()
+	hashPassword, err := helpers.HashPassword(req.Password)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.Internal,
 			"Could not generate new user password hash")
 	}
 
-	req.User.Password = hashPassword
-	userOrm, err := req.User.ToORM(ctx)
+	req.Password = hashPassword
+	userOrm, err := req.ToORM(ctx)
 	if err != nil {
 		log.Println(err)
 		return nil, status.Errorf(codes.Internal,
@@ -39,7 +39,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*m
 			"Unable to create user. DB failed to insert")
 	}
 
-	return req.User, nil
+	return req, nil
 
 }
 
