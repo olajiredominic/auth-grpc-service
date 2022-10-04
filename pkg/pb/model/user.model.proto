@@ -16,7 +16,7 @@ message Address {
   string Type = 7;
   User User = 8 [(gorm.field).belongs_to = {}];
   google.protobuf.Timestamp  CreatedAt  = 9;
-  google.protobuf.Timestamp  ModifiedAt  = 10;
+  google.protobuf.Timestamp  UpdatedAt  = 10;
 }
 
 message UserPermissions {
@@ -24,7 +24,7 @@ message UserPermissions {
 	User User    = 1 [(gorm.field).belongs_to = {}];
 	string Permission = 2;
   google.protobuf.Timestamp  CreatedAt  = 3;
-  google.protobuf.Timestamp  ModifiedAt  = 4;
+  google.protobuf.Timestamp  UpdatedAt  = 4;
 }
 
 message User {
@@ -40,5 +40,5 @@ message User {
     string Token  = 8;
     string Role  = 9;
     google.protobuf.Timestamp  CreatedAt  = 10;
-    google.protobuf.Timestamp  ModifiedAt  = 11;
+    google.protobuf.Timestamp  UpdatedAt  = 11;
   }

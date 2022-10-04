@@ -15,6 +15,14 @@ import (
 )
 
 func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.User, error) {
+	var user models.UserORM
+	//  Checks auth fields exist
+	checkUser := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.Email, req.Username, req.Telephone)
+	if checkUser.Error == nil {
+		log.Println("Tried creating user. User exists")
+		return nil, status.Errorf(codes.AlreadyExists,
+			"User exists")
+	}
 
 	req.Id = uuid.New().String()
 	hashPassword, err := helpers.HashPassword(req.Password)
@@ -40,7 +48,6 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 	}
 
 	return req, nil
-
 }
 
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.User, error) {
@@ -61,11 +68,9 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 	}
 
 	return &userData, nil
-
 }
 
 func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
-
 	// TODO: Implement search filters
 	var usersORMList []*models.UserORM
 	var users []*models.User
@@ -92,36 +97,39 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 		Limit: 10,
 		Page:  1,
 	}, nil
-
 }
 
-func (h *Handler) UpdateUser(ctx context.Context, req *pb.UpdateUserRequest) (*models.User, error) {
+func (h *Handler) UpdateUser(ctx context.Context, req *models.User) (*models.User, error) {
 
 	var user models.UserORM
-	query := h.DB.First(&user, "id = ?", req.User.Id)
+	query := h.DB.First(&user, "id = ?", req.Id)
 	if query.Error != nil {
-		log.Println(query.Error)
+		log.Println("Error fetching user ", req.Id, query.Error)
 		return nil, status.Errorf(codes.NotFound,
 			"User not found")
 	}
 
-	userData, err := req.User.ToORM(ctx)
+	userData, err := req.ToORM(ctx)
 	if err != nil {
-		log.Println(query.Error)
+		log.Println("Unable to convert to ORM ", req, err)
 		return nil, status.Errorf(codes.NotFound,
 			"User not found")
 	}
 
-	h.DB.Save(userData)
+	userData.Password = user.Password
+	userData.CreatedAt = user.CreatedAt
+	userData.UpdatedAt = user.UpdatedAt
+	userData.Role = user.Role
+	userData.Email = user.Email
+	h.DB.Save(&userData)
 
-	return req.User, nil
-
+	return req, nil
 }
 
 func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*emptypb.Empty, error) {
 
 	// TODO: Implement soft Delete
-	query := h.DB.Delete(&models.UserORM{}, req.Id)
+	query := h.DB.Where("id = ?", req.GetId()).Delete(&models.UserORM{})
 	if query.Error != nil {
 		log.Println(query.Error)
 		return &emptypb.Empty{}, status.Errorf(codes.NotFound,

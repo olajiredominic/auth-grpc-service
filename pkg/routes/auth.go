@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -21,7 +22,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequ
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.InvalidArgument,
-			"Invalid username or password")
+			"Invalid user or user not found or has been removed!")
 	}
 
 	if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
@@ -36,7 +37,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequ
 			"An unexpected error occured")
 	}
 
-	result := h.DB.Model(&user).Where(&models.User{Email: user.Email}).Update("Password", password)
+	result := h.DB.Model(&user).Where("id = ?", req.GetId()).Update("Password", password)
 	// Append to the Books table
 	if result.Error != nil {
 		return nil, status.Errorf(codes.Internal,
@@ -49,7 +50,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequ
 func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*emptypb.Empty, error) {
 
 	var user models.UserORM
-	query := h.DB.First(&user, "email = ? OR username = ? OR telephone", req.LoginId, req.LoginId, req.LoginId)
+	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.NotFound,
@@ -57,7 +58,6 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 	}
 
 	// Send email to send token if user is found
-
 	user.Token = helpers.GetOTP(6)
 
 	h.DB.Save(user)
@@ -65,15 +65,19 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*emptypb.Empty, error) {
+func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
 
-	valid, error := helpers.ValidateJWTToken(req.Token)
-	if !valid || error != nil {
+	payload, error := helpers.ValidateJWTToken(req.Token)
+	if payload == "" || error != nil {
+		log.Println("Error validating token ", req.Token, error.Error())
 		return nil, status.Errorf(codes.Unauthenticated,
 			"Invalid authentication token or expired")
 	}
 
-	return &emptypb.Empty{}, nil
+	data := pb.ValidateTokenResponse{}
+	json.Unmarshal([]byte(payload), &data)
+
+	return &data, nil
 }
 
 func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*emptypb.Empty, error) {
@@ -92,7 +96,7 @@ func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionReques
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
 
 	var user models.UserORM
-	query := h.DB.First(&user, "email = ? OR username = ? OR telephone", req.LoginId, req.LoginId, req.LoginId)
+	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.InvalidArgument,
@@ -105,8 +109,8 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 	}
 
 	claims := map[string]string{
-		"id":   user.Id,
-		"role": user.Role,
+		"Id":   user.Id,
+		"Role": user.Role,
 	}
 
 	tokenString, err := helpers.GenerateToken(claims)
@@ -125,7 +129,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*emptypb.Empty, error) {
 
 	var user models.UserORM
-	query := h.DB.First(&user, "email = ? OR username = ? OR telephone", req.LoginId, req.LoginId, req.LoginId)
+	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.NotFound,
@@ -133,13 +137,13 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 	}
 
 	now := time.Now()
-	expiredTime := user.ModifiedAt.Add(10 * time.Minute)
+	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
 	expired := expiredTime.Before(now)
 
 	if user.Token != req.Token || expired {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.PermissionDenied,
-			"User not found")
+			"Invalid or expired authentication token")
 	}
 
 	hashPassword, err := helpers.HashPassword(req.Password)
@@ -150,6 +154,7 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 	}
 
 	user.Password = hashPassword
+	user.Token = helpers.GetOTP(6)
 	h.DB.Save(user)
 
 	return &emptypb.Empty{}, nil

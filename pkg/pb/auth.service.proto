@@ -20,7 +20,7 @@ service AuthService {
 
   rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
 
-  rpc ValidateToken(ValidateTokenRequest) returns (google.protobuf.Empty) { }
+  rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) { }
 }
 
 message LoginUserRequest {
@@ -69,4 +69,10 @@ message HasPermissionRequest {
 message ValidateTokenRequest {
   // Checks auth token is valid
   string Token = 1;
+}
+
+message ValidateTokenResponse {
+  // Checks auth token is valid
+  string Id = 1;
+  string Role = 2;
 }

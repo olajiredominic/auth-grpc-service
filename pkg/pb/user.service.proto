@@ -17,7 +17,7 @@ service UserService {
 
   rpc CreateUser(User) returns (User) { }
 
-  rpc UpdateUser(UpdateUserRequest) returns (User) {}
+  rpc UpdateUser(User) returns (User) {}
 
   rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
 }
@@ -56,11 +56,6 @@ message ListUsersResponse {
 message GetUserRequest {
   // The field will contain name of the resource requested.
   string Id = 1;
-}
-
-message UpdateUserRequest {
-  // The User resource which replaces the resource on the server.
-  User User = 1;
 }
 
 message DeleteUserRequest {

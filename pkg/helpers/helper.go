@@ -87,12 +87,12 @@ func GenerateToken(payload map[string]string) (string, error) {
 }
 
 // This helps in validating the token
-func ValidateJWTToken(token string) (bool, error) {
+func ValidateJWTToken(token string) (string, error) {
 
 	config, err := config.LoadConfig()
 	if err != nil {
 		fmt.Println("Error generating Token")
-		return false, err
+		return "", err
 	}
 
 	secret := config.JWT_SECRET
@@ -100,17 +100,17 @@ func ValidateJWTToken(token string) (bool, error) {
 	splitToken := strings.Split(token, ".")
 	// if length is not 3, we know that the token is corrupt
 	if len(splitToken) != 3 {
-		return false, nil
+		return "", nil
 	}
 
 	// decode the header and payload back to strings
 	header, err := base64.StdEncoding.DecodeString(splitToken[0])
 	if err != nil {
-		return false, err
+		return "", err
 	}
 	payload, err := base64.StdEncoding.DecodeString(splitToken[1])
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
 	//again create the signature
@@ -123,8 +123,11 @@ func ValidateJWTToken(token string) (bool, error) {
 
 	// if both the signature dont match, this means token is wrong
 	if signature != splitToken[2] {
-		return false, nil
+		return "", nil
 	}
+
+	data := map[string]string{}
+	json.Unmarshal(payload, &data)
 	// This means the token matches
-	return true, nil
+	return data["user"], nil
 }
