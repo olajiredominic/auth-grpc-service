@@ -4,10 +4,6 @@ files:
  - source: .
    destination: /home/ec2-user/auth_app
 hooks:
-  AfterInstall:
-   - location: scripts/install_app_dependencies
-     timeout: 300
-     runas: root
   ApplicationStart:
    - location: scripts/start_server
      timeout: 300
