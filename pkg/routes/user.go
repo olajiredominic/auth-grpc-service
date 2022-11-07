@@ -17,7 +17,7 @@ import (
 func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.User, error) {
 	var user models.UserORM
 	//  Checks auth fields exist
-	checkUser := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.Email, req.Username, req.Telephone)
+	checkUser := h.DB.First(&user, "email = ? OR (username = ? AND username != '') OR telephone = ?", req.Email, req.Username, req.Telephone)
 	if checkUser.Error == nil {
 		log.Println("Tried creating user. User exists")
 		return nil, status.Errorf(codes.AlreadyExists,

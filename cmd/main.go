@@ -27,7 +27,7 @@ func main() {
 	}
 
 	dbUrl := fmt.Sprintf("postgres://%s:%s@%s", config.DBUSER, config.DBPWD, config.DBURL)
-	fmt.Printf("Database Url", dbUrl)
+	log.Println("Database Url", dbUrl)
 	handler := routes.Init(dbUrl)
 	h := routes.New(handler.DB)
 

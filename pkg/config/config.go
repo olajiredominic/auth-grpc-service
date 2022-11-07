@@ -29,6 +29,7 @@ func LoadConfig() (config Config, err error) {
 
 	// err = viper.Unmarshal(&config)
 
+	// TODO: Set config for permission type possibly in env
 	config = Config{
 		Port:    os.Getenv("Port"),
 		DBURL:   os.Getenv("DB_URL"),

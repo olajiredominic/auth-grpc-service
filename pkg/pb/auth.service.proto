@@ -76,3 +76,6 @@ message ValidateTokenResponse {
   string Id = 1;
   string Role = 2;
 }
+
+
+// TODO: Set config for permission type possibly in env

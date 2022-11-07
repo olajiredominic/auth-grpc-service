@@ -2,7 +2,6 @@ package routes
 
 import (
 	"context"
-	"encoding/json"
 	"log"
 	"time"
 
@@ -66,7 +65,6 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 }
 
 func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
-
 	payload, error := helpers.ValidateJWTToken(req.Token)
 	if payload == "" || error != nil {
 		log.Println("Error validating token ", req.Token, error.Error())
@@ -75,7 +73,6 @@ func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReques
 	}
 
 	data := pb.ValidateTokenResponse{}
-	json.Unmarshal([]byte(payload), &data)
 
 	return &data, nil
 }
@@ -83,7 +80,7 @@ func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReques
 func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*emptypb.Empty, error) {
 
 	var userPermission models.UserPermissionsORM
-	query := h.DB.First(&userPermission, "permission = ? AND userId = ?", req.Permission, req.Id)
+	query := h.DB.First(&userPermission, "permission = ? AND user_id = ?", req.Permission, req.Id)
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.Unauthenticated,
