@@ -12,7 +12,7 @@ terraform {
     organization = "City-Hotels"
 
     workspaces {
-      name = "gh-actions-demo"
+      name = "ch-backend"
     }
   }
 }
