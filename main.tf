@@ -2,16 +2,12 @@ terraform {
   required_providers {
     aws = {
       source = "hashicorp/aws"
-      version = "3.26.0"
     }
     random = {
       source = "hashicorp/random"
-      version = "3.0.1"
     }
   }
-  
-  required_version = ">= 1.1.0"
-
+  required_version = ">= 1.3.0"
 
   cloud {
     organization = "City-Hotels"
@@ -26,7 +22,7 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "ch_backend" "sg" {}
+resource "random_pet" "sg" {}
 
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -60,7 +56,7 @@ resource "aws_instance" "web" {
 }
 
 resource "aws_security_group" "web-sg" {
-  name = "${ch_backend.sg.id}-sg"
+  name = "${random_pet.sg.id}-sg"
   ingress {
     from_port   = 8080
     to_port     = 8080
