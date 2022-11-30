@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
  - source: .
-   destination: /home/ec2-user/auth_app
+   destination: /home/ubuntu/auth_app
 hooks:
   ApplicationStart:
    - location: ./scripts/start_server
