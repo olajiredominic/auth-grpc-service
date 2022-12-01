@@ -4,6 +4,10 @@ files:
  - source: .
    destination: /home/ubuntu/auth_app
 hooks:
+ Build:
+   - location: ./scripts/install_app_dependencies
+     timeout: 300
+     runas: root
   ApplicationStart:
    - location: ./scripts/start_server
      timeout: 300
