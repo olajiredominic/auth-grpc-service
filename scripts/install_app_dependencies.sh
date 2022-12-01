@@ -1,6 +1,6 @@
 #!/bin/bash
-echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/bash.bashrc
-source /etc/bash.bashrc
+echo "export PATH=$PATH:/usr/local/go/bin" >> ~/.profile
+source ~/.profile
 
 cd /home/ubuntu
 chmod +w ./auth_app
