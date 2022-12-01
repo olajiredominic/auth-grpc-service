@@ -4,7 +4,7 @@ files:
  - source: .
    destination: /home/ubuntu/auth_app
 hooks:
-  Install:
+  AfterInstall:
    - location: ./scripts/install_app_dependencies
      timeout: 300
      runas: root
