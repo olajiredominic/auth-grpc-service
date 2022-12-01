@@ -25,7 +25,7 @@ jobs:
       run: go mod init
 
     - name: Build
-      run: go build -o ./cmd auth_app
+      run: go build  -v ./...
 
     - name: Test
       run: go test -v ./...
