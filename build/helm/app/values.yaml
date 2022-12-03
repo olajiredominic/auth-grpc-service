@@ -96,3 +96,5 @@ db:
   user: Y3dieXF4a20=
   pwd: WWUtSXFsa2R2YUR0YVk0aG1USWs2VVZqb3dORDNXUEw=
   port: :5432
+jwt: 
+  secret: 12343

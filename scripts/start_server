@@ -1,7 +1,12 @@
 #!/bin/bash
 cd /home/ubuntu/auth_app
-export DB_PWD=Ye-IqlkdvaDtaY4hmTIk6UVjowND3WPL
-export DB_URL=kesavan.db.elephantsql.com/cwbyqxkm
-export DB_USER=cwbyqxkm
-export Port=:5432
+export AUTH_DB_URL=kesavan.db.elephantsql.com/cwbyqxkm
+export AUTH_DB_USER=cwbyqxkm
+export AUTH_DB_PWD=Ye-IqlkdvaDtaY4hmTIk6UVjowND3WPL
+export AUTH_SVC_PORT=:5432
+export JWT_SECRET=123455
 ./auth_app > /dev/null 2> /dev/null < /dev/nul &
+
+
+
+

@@ -56,26 +56,31 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-            - name : Port
+            - name : AUTH_SVC_PORT
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: appPort
-            - name : DB_URL
+            - name : AUTH_DB_URL
               valueFrom:
                 configMapKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: dbUrl
-            - name : DB_USER
+            - name : AUTH_DB_USER
               valueFrom:
                 secretKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: dbUser
-            - name : DB_PWD
+            - name : AUTH_DB_PWD
               valueFrom:
                 secretKeyRef:
                   name: {{ include "app.fullname" . }}
                   key: dbPassword
+            - name : JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "app.fullname" . }}
+                  key: jwtSecret
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
