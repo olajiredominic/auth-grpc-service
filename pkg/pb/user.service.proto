@@ -1,0 +1,65 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "pkg/pb/model/user.model.proto";
+
+
+package user;
+
+option go_package = "pkg/pb";
+
+
+// Generated according to https://cloud.google.com/apis/design/standard_methods
+service UserService {
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
+
+  rpc GetUser(GetUserRequest) returns (User) { }
+
+  rpc CreateUser(User) returns (User) { }
+
+  rpc UpdateUser(User) returns (User) {}
+
+  rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
+}
+
+message ListUsersRequest {
+  // The parent resource name, for example, "shelves/shelf1"
+  optional string parent = 1;
+
+  // The maximum number of items to return.
+  int32 Limit = 2;
+
+  // The next_page_token value returned from a previous List request, if any.
+  int32 Page = 3;
+
+  optional string Email = 4;
+
+  optional string Name = 5;
+
+  optional string Role = 6;
+
+  optional google.protobuf.Timestamp CreatedAt  = 7;
+  optional google.protobuf.Timestamp ModifiedAt = 8;
+}
+
+message ListUsersResponse {
+  // The field name should match the noun "User" in the method name.
+  // There will be a maximum number of items returned based on the page_size field in the request.
+  repeated User Users = 1;
+
+  // Token to retrieve the next page of results, or empty if there are no more results in the list.
+  int32 Limit = 2;
+
+  int32 Page = 3;
+}
+
+message GetUserRequest {
+  // The field will contain name of the resource requested.
+  string Id = 1;
+}
+
+message DeleteUserRequest {
+
+  // The resource name of the User to be deleted.
+  string id = 1;
+}

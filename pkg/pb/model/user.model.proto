@@ -1,0 +1,44 @@
+
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "pkg/pb/model/gorm.proto";
+
+option go_package = "pkg/pb/model";
+
+message Address {
+  option (gorm.opts).ormable = true;
+  int32 Id = 1 [(gorm.field).tag = {type: "integer" primary_key: true}];
+  string Address = 2;
+  string City = 3;
+  string State = 4;
+  string Zip = 5;
+  string Country = 6;
+  string Type = 7;
+  User User = 8 [(gorm.field).belongs_to = {}];
+  google.protobuf.Timestamp  CreatedAt  = 9;
+  google.protobuf.Timestamp  UpdatedAt  = 10;
+}
+
+message UserPermissions {
+  option (gorm.opts).ormable = true;
+	User User    = 1 [(gorm.field).belongs_to = {}];
+	string Permission = 2;
+  google.protobuf.Timestamp  CreatedAt  = 3;
+  google.protobuf.Timestamp  UpdatedAt  = 4;
+}
+
+message User {
+    option (gorm.opts).ormable = true;
+  // ! This should be defined elsewere
+    string Id = 1 [(gorm.field).tag = {type: "uuid" primary_key: true}];
+    string Email  = 2;
+    string Username  = 3;
+    string Password  = 4;
+    string Firstname  = 5;
+    string Lastname  = 6;
+    string Telephone  = 7;
+    string Token  = 8;
+    string Role  = 9;
+    google.protobuf.Timestamp  CreatedAt  = 10;
+    google.protobuf.Timestamp  UpdatedAt  = 11;
+  }
