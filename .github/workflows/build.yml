@@ -19,10 +19,17 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v3
       with:
+<<<<<<< HEAD
         go-version: 1.18
 
     - name: Build
       run: go build -o ./auth_app ./cmd
+=======
+        go-version: 1.19
+
+    - name: Build
+      run: go build -v ./...
+>>>>>>> 65d5bf2dc0c13a1260bf43f86eaaad5e52f678ba
 
     - name: Test
       run: go test -v ./...
