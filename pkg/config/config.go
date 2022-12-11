@@ -15,29 +15,24 @@ type Config struct {
 }
 
 func LoadConfig() (config Config, err error) {
-	// viper.AddConfigPath("../pkg/config/envs")
-	// viper.SetConfigName("dev")
-	// viper.SetConfigType("env")
+	viper.AddConfigPath(".")
+// 	viper.SetConfigName("dev")
+	viper.SetConfigType("env")
 
-	// viper.AutomaticEnv()
+	viper.AutomaticEnv()
 
-	// err = viper.ReadInConfig()
+	err = viper.ReadInConfig()
 
-	// if err != nil {
-	// 	return
-	// }
-
-	// err = viper.Unmarshal(&config)
-
-	// TODO: Set config for permission type possibly in env
-	config = Config{
-		Port:       os.Getenv("AUTH_SVC_PORT"),
-		DBURL:      os.Getenv("AUTH_DB_URL"),
-		DBUSER:     os.Getenv("AUTH_DB_USER"),
-		DBPWD:      os.Getenv("AUTH_DB_PWD"),
-		APP_URL:    os.Getenv("APP_URL"),
-		JWT_SECRET: os.Getenv("JWT_SECRET"),
+	if err != nil {
+		return Config{}, err
 	}
+
+	err = viper.Unmarshal(&config)
+	if err != nil {
+		return Config{}, err
+	}
+
+// 	TODO: Set config for permission type possibly in env
 
 	return config, err
 }
