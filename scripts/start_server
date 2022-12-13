@@ -1,3 +1,4 @@
 #!/bin/bash
 cd /home/ubuntu/auth_app
 ./auth_app > /dev/null 2> /dev/null < /dev/null &
+
