@@ -4,6 +4,9 @@ files:
  - source: .
    destination: /home/ubuntu/auth_app
 hooks:
+  ApplicationStop:
+   - location: ./scripts/stop_server.sh
+     runas: root
   AfterInstall:
    - location: ./scripts/install_app_dependencies.sh
      timeout: 300
