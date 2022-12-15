@@ -2,6 +2,7 @@ package routes
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"time"
 
@@ -71,8 +72,9 @@ func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReques
 		return nil, status.Errorf(codes.Unauthenticated,
 			"Invalid authentication token or expired")
 	}
-
 	data := pb.ValidateTokenResponse{}
+
+	json.Unmarshal([]byte(payload), &data)
 
 	return &data, nil
 }

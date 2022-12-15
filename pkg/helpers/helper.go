@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"strings"
 	"time"
@@ -29,7 +30,8 @@ func GetOTP(length int) string {
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {
-		panic(err)
+		log.Println("Invalid OTP", err)
+		return ""
 	}
 	return base32.StdEncoding.EncodeToString(randomBytes)[:length]
 }
