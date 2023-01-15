@@ -21,6 +21,8 @@ service AuthService {
   rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
 
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) { }
+
+  rpc VerifyOTP(VerifyOTPRequest) returns (ValidateTokenResponse) { }
 }
 
 message LoginUserRequest {
@@ -76,6 +78,13 @@ message ValidateTokenResponse {
   string Id = 1;
   string Role = 2;
 }
+
+message VerifyOTPRequest {
+  // Checks auth token is valid
+  string Token = 1;
+  string LoginId = 2;
+}
+
 
 
 // TODO: Set config for permission type possibly in env

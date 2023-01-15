@@ -79,6 +79,29 @@ func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReques
 	return &data, nil
 }
 
+func (h *Handler) VerifyOTP(ctx context.Context, req *pb.UpdatePasswordRequest) (*emptypb.Empty, error) {
+
+	var user models.UserORM
+	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
+	if query.Error != nil {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.NotFound,
+			"User not found")
+	}
+
+	now := time.Now()
+	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
+	expired := expiredTime.Before(now)
+
+	if user.Token != req.Token || expired {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.PermissionDenied,
+			"Invalid or expired authentication token")
+	}
+
+	return &emptypb.Empty{}, nil
+}
+
 func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*emptypb.Empty, error) {
 
 	var userPermission models.UserPermissionsORM

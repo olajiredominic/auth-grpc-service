@@ -93,7 +93,7 @@ func ValidateJWTToken(token string) (string, error) {
 
 	config, err := config.LoadConfig()
 	if err != nil {
-		fmt.Println("Error generating Token")
+		log.Println("Error generating Token")
 		return "", err
 	}
 
@@ -121,7 +121,6 @@ func ValidateJWTToken(token string) (string, error) {
 	h.Write([]byte(unsignedStr))
 
 	signature := base64.StdEncoding.EncodeToString(h.Sum(nil))
-	fmt.Println(signature)
 
 	// if both the signature dont match, this means token is wrong
 	if signature != splitToken[2] {
