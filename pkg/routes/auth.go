@@ -79,7 +79,7 @@ func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenReques
 	return &data, nil
 }
 
-func (h *Handler) VerifyOTP(ctx context.Context, req *pb.UpdatePasswordRequest) (*emptypb.Empty, error) {
+func (h *Handler) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*emptypb.Empty, error) {
 
 	var user models.UserORM
 	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
@@ -91,8 +91,10 @@ func (h *Handler) VerifyOTP(ctx context.Context, req *pb.UpdatePasswordRequest) 
 
 	now := time.Now()
 	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
-	expired := expiredTime.Before(now)
+	expired := now.After(expiredTime)
 
+	log.Println(query.Error, now,
+		expiredTime)
 	if user.Token != req.Token || expired {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.PermissionDenied,
@@ -160,17 +162,17 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 
 	now := time.Now()
 	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
-	expired := expiredTime.Before(now)
+	expired := now.After(expiredTime)
 
 	if user.Token != req.Token || expired {
-		log.Println(query.Error)
+		log.Println("Invalid OTP", query.Error)
 		return nil, status.Errorf(codes.PermissionDenied,
 			"Invalid or expired authentication token")
 	}
 
 	hashPassword, err := helpers.HashPassword(req.Password)
 	if err != nil {
-		log.Println(err)
+		log.Println("Could not generate new user password hash", err)
 		return nil, status.Errorf(codes.Internal,
 			"Could not generate new user password hash")
 	}

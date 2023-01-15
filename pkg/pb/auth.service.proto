@@ -22,7 +22,7 @@ service AuthService {
 
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) { }
 
-  rpc VerifyOTP(VerifyOTPRequest) returns (ValidateTokenResponse) { }
+  rpc VerifyOTP(VerifyOTPRequest) returns (google.protobuf.Empty) { }
 }
 
 message LoginUserRequest {
