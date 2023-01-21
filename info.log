@@ -1,0 +1,157 @@
+go run cmd/main.go
+
+2023/01/19 16:42:10 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:167 [33mSLOW SQL >= 200ms
+[0m[31;1m[1674.888ms] [33m[rows:1][35m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND table_type = 'BASE TABLE'[0m
+
+2023/01/19 16:42:12 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:42 [33mSLOW SQL >= 200ms
+[0m[31;1m[1601.435ms] [33m[rows:1][35m SELECT CURRENT_DATABASE()[0m
+
+2023/01/19 16:42:15 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:369 [33mSLOW SQL >= 200ms
+[0m[31;1m[3540.716ms] [33m[rows:-][35m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'cwbyqxkm' AND table_schema = CURRENT_SCHEMA() AND table_name = 'users'[0m
+
+2023/01/19 16:42:17 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:524 [33mSLOW SQL >= 200ms
+[0m[31;1m[1699.198ms] [33m[rows:-][35m SELECT * FROM "users" LIMIT 1[0m
+
+2023/01/19 16:42:18 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:439 [33mSLOW SQL >= 200ms
+[0m[31;1m[780.247ms] [33m[rows:-][35m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users' AND constraint_type = 'UNIQUE'[0m
+
+2023/01/19 16:42:20 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:451 [33mSLOW SQL >= 200ms
+[0m[31;1m[2044.422ms] [33m[rows:-][35m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'users'[0m
+
+2023/01/19 16:42:21 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:482 [33mSLOW SQL >= 200ms
+[0m[31;1m[771.567ms] [33m[rows:-][35m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
+		WHERE a.attnum > 0 -- hide internal columns
+		AND NOT a.attisdropped -- hide deleted columns
+		AND b.relname = 'users'[0m
+
+2023/01/19 16:42:22 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[1405.535ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:22 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[387.524ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'email') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:23 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[373.990ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'firstname') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:23 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[380.532ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:25 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[1564.763ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'lastname') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:25 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[389.359ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'password') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:25 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[384.416ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'role') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:26 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[402.189ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'telephone') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:27 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[963.786ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'token') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:27 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[370.922ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:28 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[386.671ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'users' AND column_name = 'username') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'users' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:29 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:167 [33mSLOW SQL >= 200ms
+[0m[31;1m[1577.158ms] [33m[rows:1][35m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND table_type = 'BASE TABLE'[0m
+
+2023/01/19 16:42:29 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:42 [33mSLOW SQL >= 200ms
+[0m[31;1m[376.008ms] [33m[rows:1][35m SELECT CURRENT_DATABASE()[0m
+
+2023/01/19 16:42:30 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:369 [33mSLOW SQL >= 200ms
+[0m[31;1m[399.216ms] [33m[rows:-][35m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'cwbyqxkm' AND table_schema = CURRENT_SCHEMA() AND table_name = 'addresses'[0m
+
+2023/01/19 16:42:30 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:524 [33mSLOW SQL >= 200ms
+[0m[31;1m[396.408ms] [33m[rows:-][35m SELECT * FROM "addresses" LIMIT 1[0m
+
+2023/01/19 16:42:31 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:439 [33mSLOW SQL >= 200ms
+[0m[31;1m[369.822ms] [33m[rows:-][35m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'addresses' AND constraint_type = 'UNIQUE'[0m
+
+2023/01/19 16:42:32 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:451 [33mSLOW SQL >= 200ms
+[0m[31;1m[989.489ms] [33m[rows:-][35m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'addresses'[0m
+
+2023/01/19 16:42:32 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:482 [33mSLOW SQL >= 200ms
+[0m[31;1m[384.971ms] [33m[rows:-][35m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
+		WHERE a.attnum > 0 -- hide internal columns
+		AND NOT a.attisdropped -- hide deleted columns
+		AND b.relname = 'addresses'[0m
+
+2023/01/19 16:42:35 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[2790.039ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'address') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:35 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[395.780ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'city') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:36 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[442.643ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'country') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:37 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[1337.192ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:37 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[388.798ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:38 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[401.597ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'state') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:38 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[401.556ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'type') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:39 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[545.142ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:40 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[1563.070ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'user_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:41 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[388.012ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND column_name = 'zip') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'addresses' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:41 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:355 [33mSLOW SQL >= 200ms
+[0m[31;1m[775.805ms] [33m[rows:1][35m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'addresses' AND constraint_name = 'fk_addresses_user'[0m
+
+2023/01/19 16:42:43 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:167 [33mSLOW SQL >= 200ms
+[0m[31;1m[1356.582ms] [33m[rows:1][35m SELECT count(*) FROM information_schema.tables WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND table_type = 'BASE TABLE'[0m
+
+2023/01/19 16:42:43 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:42 [33mSLOW SQL >= 200ms
+[0m[31;1m[383.437ms] [33m[rows:1][35m SELECT CURRENT_DATABASE()[0m
+
+2023/01/19 16:42:44 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:369 [33mSLOW SQL >= 200ms
+[0m[31;1m[1301.499ms] [33m[rows:-][35m SELECT c.column_name, c.is_nullable = 'YES', c.udt_name, c.character_maximum_length, c.numeric_precision, c.numeric_precision_radix, c.numeric_scale, c.datetime_precision, 8 * typlen, c.column_default, pd.description FROM information_schema.columns AS c JOIN pg_type AS pgt ON c.udt_name = pgt.typname LEFT JOIN pg_catalog.pg_description as pd ON pd.objsubid = c.ordinal_position AND pd.objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = c.table_name AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = c.table_schema)) where table_catalog = 'cwbyqxkm' AND table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions'[0m
+
+2023/01/19 16:42:47 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:524 [33mSLOW SQL >= 200ms
+[0m[31;1m[2868.302ms] [33m[rows:-][35m SELECT * FROM "user_permissions" LIMIT 1[0m
+
+2023/01/19 16:42:48 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:439 [33mSLOW SQL >= 200ms
+[0m[31;1m[389.559ms] [33m[rows:-][35m SELECT constraint_name FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'user_permissions' AND constraint_type = 'UNIQUE'[0m
+
+2023/01/19 16:42:49 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:451 [33mSLOW SQL >= 200ms
+[0m[31;1m[752.950ms] [33m[rows:-][35m SELECT c.column_name, constraint_name, constraint_type FROM information_schema.table_constraints tc JOIN information_schema.constraint_column_usage AS ccu USING (constraint_schema, constraint_name) JOIN information_schema.columns AS c ON c.table_schema = tc.constraint_schema AND tc.table_name = c.table_name AND ccu.column_name = c.column_name WHERE constraint_type IN ('PRIMARY KEY', 'UNIQUE') AND c.table_catalog = 'cwbyqxkm' AND c.table_schema = CURRENT_SCHEMA() AND c.table_name = 'user_permissions'[0m
+
+2023/01/19 16:42:49 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:482 [33mSLOW SQL >= 200ms
+[0m[31;1m[390.498ms] [33m[rows:-][35m SELECT a.attname as column_name, format_type(a.atttypid, a.atttypmod) AS data_type
+		FROM pg_attribute a JOIN pg_class b ON a.attrelid = b.oid AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA())
+		WHERE a.attnum > 0 -- hide internal columns
+		AND NOT a.attisdropped -- hide deleted columns
+		AND b.relname = 'user_permissions'[0m
+
+2023/01/19 16:42:49 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[377.942ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND column_name = 'created_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'user_permissions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:50 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[433.929ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND column_name = 'permission') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'user_permissions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:50 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[386.916ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND column_name = 'updated_at') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'user_permissions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:51 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:240 [33mSLOW SQL >= 200ms
+[0m[31;1m[1218.684ms] [33m[rows:0][35m SELECT description FROM pg_catalog.pg_description WHERE objsubid = (SELECT ordinal_position FROM information_schema.columns WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND column_name = 'user_id') AND objoid = (SELECT oid FROM pg_catalog.pg_class WHERE relname = 'user_permissions' AND relnamespace = (SELECT oid FROM pg_catalog.pg_namespace WHERE nspname = CURRENT_SCHEMA()))[0m
+
+2023/01/19 16:42:52 [32m/Users/user/go/pkg/mod/gorm.io/driver/postgres@v1.3.10/migrator.go:355 [33mSLOW SQL >= 200ms
+[0m[31;1m[373.794ms] [33m[rows:1][35m SELECT count(*) FROM INFORMATION_SCHEMA.table_constraints WHERE table_schema = CURRENT_SCHEMA() AND table_name = 'user_permissions' AND constraint_name = 'fk_user_permissions_user'[0m

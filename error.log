@@ -1,0 +1,3 @@
+2023/01/19 16:41:58 Database Url postgres://cwbyqxkm:Ye-IqlkdvaDtaY4hmTIk6UVjowND3WPL@kesavan.db.elephantsql.com/cwbyqxkm
+signal: interrupt
+make: *** [server] Error 1

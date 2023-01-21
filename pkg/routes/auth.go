@@ -6,6 +6,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
 	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
@@ -115,6 +116,44 @@ func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionReques
 	return &emptypb.Empty{}, nil
 }
 
+func (h *Handler) SocialLogin(ctx context.Context, req *pb.SocialLoginRequest) (*pb.LoginUserResponse, error) {
+
+	var user models.UserORM
+	query := h.DB.First(&user, "email = ? ", req.Email)
+	if query.Error != nil {
+		user = models.UserORM{
+			Id:        uuid.New().String(),
+			Email:     req.Email,
+			Firstname: req.FirstName,
+			Lastname:  req.LastName,
+			Role:      "USER",
+		}
+
+		query = h.DB.Create(&user)
+		if query.Error != nil {
+			log.Println(query.Error)
+			return nil, status.Errorf(codes.Internal,
+				"Unable to create user. DB failed to insert")
+		}
+	}
+
+	claims := map[string]string{
+		"Id":   user.Id,
+		"Role": user.Role,
+	}
+
+	tokenString, err := helpers.GenerateToken(claims)
+	if err != nil {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.Internal,
+			"Error authenticating user!")
+	}
+
+	return &pb.LoginUserResponse{
+		Token:   tokenString,
+		Message: "Login Successful",
+	}, nil
+}
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
 
 	var user models.UserORM

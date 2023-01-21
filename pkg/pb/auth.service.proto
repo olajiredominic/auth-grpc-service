@@ -12,6 +12,8 @@ service AuthService {
 
   rpc LoginUser(LoginUserRequest) returns (LoginUserResponse) {}
 
+  rpc SocialLogin(SocialLoginRequest) returns (LoginUserResponse) {}
+
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {}
 
   rpc ForgotPassword(ForgotPasswordRequest) returns (google.protobuf.Empty) {}
@@ -32,6 +34,13 @@ message LoginUserRequest {
   optional string Password = 2;
 }
 
+message SocialLoginRequest {
+  string Email = 1;
+  string FirstName = 2;
+  string LastName = 3;
+  string Token = 4;
+  string Issuer = 5;
+}
 
 message LoginUserResponse {
   // Generic response used by all
@@ -52,8 +61,6 @@ message ForgotPasswordRequest {
   // The field will contain name of the resource requested.
   string LoginId = 1;
 }
-
-
 
 message UpdatePasswordRequest {
   // Updates an auth account with new password
@@ -84,6 +91,8 @@ message VerifyOTPRequest {
   string Token = 1;
   string LoginId = 2;
 }
+
+
 
 
 

@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthServiceClient interface {
 	LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
+	SocialLogin(ctx context.Context, in *SocialLoginRequest, opts ...grpc.CallOption) (*LoginUserResponse, error)
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ResetPassword(ctx context.Context, in *UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -43,6 +44,15 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 func (c *authServiceClient) LoginUser(ctx context.Context, in *LoginUserRequest, opts ...grpc.CallOption) (*LoginUserResponse, error) {
 	out := new(LoginUserResponse)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/LoginUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) SocialLogin(ctx context.Context, in *SocialLoginRequest, opts ...grpc.CallOption) (*LoginUserResponse, error) {
+	out := new(LoginUserResponse)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/SocialLogin", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -108,6 +118,7 @@ func (c *authServiceClient) VerifyOTP(ctx context.Context, in *VerifyOTPRequest,
 // for forward compatibility
 type AuthServiceServer interface {
 	LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error)
+	SocialLogin(context.Context, *SocialLoginRequest) (*LoginUserResponse, error)
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*emptypb.Empty, error)
 	ResetPassword(context.Context, *UpdatePasswordRequest) (*emptypb.Empty, error)
@@ -122,6 +133,9 @@ type UnimplementedAuthServiceServer struct {
 
 func (UnimplementedAuthServiceServer) LoginUser(context.Context, *LoginUserRequest) (*LoginUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method LoginUser not implemented")
+}
+func (UnimplementedAuthServiceServer) SocialLogin(context.Context, *SocialLoginRequest) (*LoginUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SocialLogin not implemented")
 }
 func (UnimplementedAuthServiceServer) ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ChangePassword not implemented")
@@ -167,6 +181,24 @@ func _AuthService_LoginUser_Handler(srv interface{}, ctx context.Context, dec fu
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).LoginUser(ctx, req.(*LoginUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_SocialLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SocialLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).SocialLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/SocialLogin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).SocialLogin(ctx, req.(*SocialLoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -289,6 +321,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LoginUser",
 			Handler:    _AuthService_LoginUser_Handler,
+		},
+		{
+			MethodName: "SocialLogin",
+			Handler:    _AuthService_SocialLogin_Handler,
 		},
 		{
 			MethodName: "ChangePassword",
