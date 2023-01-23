@@ -16,7 +16,7 @@ service AuthService {
 
   rpc ChangePassword(ChangePasswordRequest) returns (google.protobuf.Empty) {}
 
-  rpc ForgotPassword(ForgotPasswordRequest) returns (google.protobuf.Empty) {}
+  rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {}
 
   rpc ResetPassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {}
 
@@ -60,6 +60,16 @@ message ChangePasswordRequest {
 message ForgotPasswordRequest {
   // The field will contain name of the resource requested.
   string LoginId = 1;
+}
+
+message ForgotPasswordResponse {
+  // The field will contain name of the resource requested.
+  string FirstName = 1;
+  string LastName = 2;
+  string Email = 3;
+  string Token = 4;
+  string TokenExpiryDate = 5;
+
 }
 
 message UpdatePasswordRequest {

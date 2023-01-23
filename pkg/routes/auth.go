@@ -48,7 +48,7 @@ func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequ
 	return &emptypb.Empty{}, nil
 }
 
-func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*emptypb.Empty, error) {
+func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequest) (*pb.ForgotPasswordResponse, error) {
 
 	var user models.UserORM
 	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
@@ -63,7 +63,12 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 
 	h.DB.Save(user)
 
-	return &emptypb.Empty{}, nil
+	return &pb.ForgotPasswordResponse{
+		Token:     user.Token,
+		FirstName: user.Firstname,
+		LastName:  user.Lastname,
+		Email:     user.Email,
+	}, nil
 }
 
 func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
