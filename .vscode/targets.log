@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Fri Jan 20 12:04:11 2023
+# Make data base, printed on Thu Mar 23 15:28:13 2023
 
 # Variables
 
@@ -42,19 +42,17 @@ VSCODE_CWD = /
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /Users/user/go/bin:/Users/user/.nvm/versions/node/v18.10.0/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools
+PATH = /Users/user/go/bin:/Users/user/.nvm/versions/node/v18.10.0/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools
 # environment
 GOPATH = /Users/user/go
 # environment
 NVM_BIN = /Users/user/.nvm/versions/node/v18.10.0/bin
 # environment
-LaunchInstanceID = 45C4A31C-35A8-45B9-9A3B-B5DFDE0695FA
-# environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.0Uob1Uc7r1/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.XnRv6z9zu6/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -68,7 +66,7 @@ HOME = /Users/user
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/6261075646f055b99068d3688932416f2346dd3b
+VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/e2816fe719a4026ffa1ee0189dc89bdfdbafb164
 # environment
 LOGNAME = user
 # environment
@@ -104,7 +102,7 @@ TMPDIR = /var/folders/yq/3vmny5ts081_j_t20958v0rm0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.73.1-main.sock
+VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.75.0-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -116,7 +114,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/user/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.10942609.10942615
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.16853917.16853930
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -131,8 +129,6 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
-# environment
-SECURITYSESSIONID = 186a4
 # automatic
 ^F = $(notdir $^)
 # default
@@ -144,9 +140,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 442
+VSCODE_PID = 30632
 # variable set hash-table stats:
-# Load=67/1024=7%, Rehash=0, Collisions=2/91=2%
+# Load=65/1024=6%, Rehash=0, Collisions=2/89=2%
 
 # Pattern-specific Variable Values
 
@@ -231,7 +227,7 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Fri Jan 20 12:04:11 2023
+# Finished Make data base on Thu Mar 23 15:28:13 2023
 
  
 make: *** No rule to make target `all'.  Stop.

@@ -98,8 +98,8 @@ message ValidateTokenResponse {
 
 message VerifyOTPRequest {
   // Checks auth token is valid
-  string Token = 1;
-  string LoginId = 2;
+  string LoginId = 1;
+  string Token = 2;
 }
 
 
