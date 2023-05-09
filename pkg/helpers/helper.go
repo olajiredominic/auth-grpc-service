@@ -2,11 +2,13 @@ package helpers
 
 import (
 	"crypto/hmac"
+	crypRand "crypto/rand"
 	"crypto/sha256"
 	"encoding/base32"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"math/rand"
 	"strings"
@@ -26,7 +28,28 @@ func ValidatePasswordHash(hashpassword string, password string) bool {
 	return err == nil
 }
 
-func GetOTP(length int) string {
+func GetOTP(length int, numbers bool) string {
+	if numbers {
+		return GetRandNumbers(length)
+	}
+	return GetRandAlphaNumeric(length)
+}
+
+func GetRandNumbers(length int) string {
+	var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	b := make([]byte, length)
+	n, err := io.ReadAtLeast(crypRand.Reader, b, length)
+	if n != length {
+		panic(err)
+	}
+	for i := 0; i < len(b); i++ {
+		b[i] = table[int(b[i])%len(table)]
+	}
+	return string(b)
+}
+
+func GetRandAlphaNumeric(length int) string {
+
 	randomBytes := make([]byte, 32)
 	_, err := rand.Read(randomBytes)
 	if err != nil {

@@ -59,7 +59,7 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 	}
 
 	// Send email to send token if user is found
-	user.Token = helpers.GetOTP(6)
+	user.Token = helpers.GetOTP(6, true)
 
 	h.DB.Save(user)
 
@@ -220,7 +220,7 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 	}
 
 	user.Password = hashPassword
-	user.Token = helpers.GetOTP(6)
+	user.Token = helpers.GetOTP(6, true)
 	h.DB.Save(user)
 
 	return &emptypb.Empty{}, nil

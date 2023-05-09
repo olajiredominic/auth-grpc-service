@@ -6,8 +6,11 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
+ 
+make: *** No rule to make target `all'.  Stop.
 
-# Make data base, printed on Thu Mar 23 15:28:13 2023
+
+# Make data base, printed on Tue May  9 23:27:47 2023
 
 # Variables
 
@@ -15,6 +18,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
 ?F = $(notdir $?)
+# environment
+VSCODE_CRASH_REPORTER_PROCESS_TYPE = extensionHost
 # environment
 NVM_INC = /Users/user/.nvm/versions/node/v18.10.0/include/node
 # automatic
@@ -48,11 +53,13 @@ GOPATH = /Users/user/go
 # environment
 NVM_BIN = /Users/user/.nvm/versions/node/v18.10.0/bin
 # environment
+LaunchInstanceID = A4D6B5DA-67A0-4A8A-9B12-95DC1264EA7D
+# environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.XnRv6z9zu6/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.E6j8d3mbpa/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
@@ -66,7 +73,7 @@ HOME = /Users/user
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/e2816fe719a4026ffa1ee0189dc89bdfdbafb164
+VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/ee2b180d582a7f601fa6ecfdad8d9fd269ab1884
 # environment
 LOGNAME = user
 # environment
@@ -102,7 +109,7 @@ TMPDIR = /var/folders/yq/3vmny5ts081_j_t20958v0rm0000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.75.0-main.sock
+VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.76-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -114,7 +121,7 @@ MFLAGS = -Rrqp
 # environment
 NVM_DIR = /Users/user/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.16853917.16853930
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.22863763.22863769
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
@@ -129,6 +136,8 @@ MAKEFILES :=
 <F = $(notdir $<)
 # environment
 LC_ALL = C
+# environment
+SECURITYSESSIONID = 186a3
 # automatic
 ^F = $(notdir $^)
 # default
@@ -140,9 +149,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 30632
+VSCODE_PID = 425
 # variable set hash-table stats:
-# Load=65/1024=6%, Rehash=0, Collisions=2/89=2%
+# Load=68/1024=7%, Rehash=0, Collisions=2/92=2%
 
 # Pattern-specific Variable Values
 
@@ -150,7 +159,7 @@ VSCODE_PID = 30632
 
 # Directories
 
-# . (device 16777220, inode 1202841): 22 files, no impossibilities.
+# . (device 16777224, inode 1202841): 22 files, no impossibilities.
 
 # 22 files, no impossibilities in 1 directories.
 
@@ -227,8 +236,6 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Thu Mar 23 15:28:13 2023
+# Finished Make data base on Tue May  9 23:27:47 2023
 
  
-make: *** No rule to make target `all'.  Stop.
-
