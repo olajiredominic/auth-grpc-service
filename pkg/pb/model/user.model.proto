@@ -3,7 +3,7 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
+option go_package = "pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;
@@ -39,6 +39,7 @@ message User {
     string Telephone  = 7;
     string Token  = 8;
     string Role  = 9;
-    google.protobuf.Timestamp  CreatedAt  = 10;
-    google.protobuf.Timestamp  UpdatedAt  = 11;
+    string ImageUrl  = 10 [json_name="imageurl"];
+    google.protobuf.Timestamp  CreatedAt  = 11 [json_name="created_at"];
+    google.protobuf.Timestamp  UpdatedAt  = 12 [json_name="updated_at"];
   }

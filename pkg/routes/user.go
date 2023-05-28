@@ -59,7 +59,6 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 		return nil, status.Errorf(codes.NotFound,
 			"User not found")
 	}
-
 	userData, err := user.ToPB(ctx)
 	if err != nil {
 		log.Println(query.Error)

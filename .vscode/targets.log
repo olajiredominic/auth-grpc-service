@@ -6,11 +6,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 # PARTICULAR PURPOSE.
 
 # This program built for i386-apple-darwin11.3.0
- 
-make: *** No rule to make target `all'.  Stop.
 
-
-# Make data base, printed on Tue May  9 23:27:47 2023
+# Make data base, printed on Sun May 28 13:51:34 2023
 
 # Variables
 
@@ -21,7 +18,7 @@ make: *** No rule to make target `all'.  Stop.
 # environment
 VSCODE_CRASH_REPORTER_PROCESS_TYPE = extensionHost
 # environment
-NVM_INC = /Users/user/.nvm/versions/node/v18.10.0/include/node
+NVM_INC = /Users/account/.nvm/versions/node/v18.15.0/include/node
 # automatic
 ?D = $(patsubst %/,%,$(dir $?))
 # automatic
@@ -29,11 +26,11 @@ NVM_INC = /Users/user/.nvm/versions/node/v18.10.0/include/node
 # automatic
 @F = $(notdir $@)
 # makefile
-CURDIR := /Users/user/Desktop/Projects/CityHotels/ch-backend-auth
+CURDIR := /Users/account/Desktop/City-Hotels/ch-auth-svc
 # makefile
 SHELL = /bin/sh
 # environment
-VSCODE_NLS_CONFIG = {"locale":"en-gb","availableLanguages":{},"_languagePackSupport":true}
+VSCODE_NLS_CONFIG = {"locale":"en-us","osLocale":"en-us","availableLanguages":{},"_languagePackSupport":true}
 # environment
 _ = /usr/bin/make
 # makefile (from `Makefile', line 1)
@@ -43,39 +40,45 @@ VSCODE_AMD_ENTRYPOINT = vs/workbench/api/node/extensionHostProcess
 # environment
 __CFBundleIdentifier = com.microsoft.VSCode
 # environment
+INFOPATH = /usr/local/share/info:
+# environment
 VSCODE_CWD = /
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /Users/user/go/bin:/Users/user/.nvm/versions/node/v18.10.0/bin:/Library/Frameworks/Python.framework/Versions/2.7/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/share/dotnet:~/.dotnet/tools
+PATH = /Users/account/.nvm/versions/node/v18.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # environment
 GOPATH = /Users/user/go
 # environment
-NVM_BIN = /Users/user/.nvm/versions/node/v18.10.0/bin
+NVM_BIN = /Users/account/.nvm/versions/node/v18.15.0/bin
 # environment
-LaunchInstanceID = A4D6B5DA-67A0-4A8A-9B12-95DC1264EA7D
+LaunchInstanceID = BEB98402-DB0E-403E-A979-601E75E54B4D
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.E6j8d3mbpa/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.2HqbIf3SqO/Listeners
 # automatic
 %F = $(notdir $%)
 # environment
-PWD = /Users/user/Desktop/Projects/CityHotels/ch-backend-auth
+PWD = /Users/account/Desktop/City-Hotels/ch-auth-svc
+# environment
+HOMEBREW_CELLAR = /usr/local/Cellar
 # environment
 ORIGINAL_XDG_CURRENT_DESKTOP = undefined
 # environment
+MANPATH = /Users/account/.nvm/versions/node/v18.15.0/share/man:/usr/local/share/man::
+# environment
 GOMODCACHE = /Users/user/go/pkg/mod
 # environment
-HOME = /Users/user
+HOME = /Users/account
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/user/Library/Application Support/Code/CachedData/ee2b180d582a7f601fa6ecfdad8d9fd269ab1884
+VSCODE_CODE_CACHE_PATH = /Users/account/Library/Application Support/Code/CachedData/b3e4e68a0bc097f0ae7907b217c1119af9e03435
 # environment
-LOGNAME = user
+LOGNAME = account
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
 # environment
@@ -92,24 +95,27 @@ MAKE = $(MAKE_COMMAND)
 MAKECMDGOALS := all
 # environment
 SHLVL = 1
+# environment
+VSCODE_CRASH_REPORTER_SANDBOXED_HINT = 1
 # default
 MAKE_VERSION := 3.81
 # environment
-USER = user
+USER = account
 # makefile
 .DEFAULT_GOAL := proto
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
 # default
+ 
 MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
 # default
 .VARIABLES := 
 # environment
-TMPDIR = /var/folders/yq/3vmny5ts081_j_t20958v0rm0000gn/T/
+TMPDIR = /var/folders/pr/_qw7l6hx24jfgr62gpg1lrz00000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/user/Library/Application Support/Code/1.76-main.sock
+VSCODE_IPC_HOOK = /Users/account/Library/Application Support/Code/1.78-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -119,15 +125,19 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
-NVM_DIR = /Users/user/.nvm
+NVM_DIR = /Users/account/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.22863763.22863769
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.5732133.5732139
+# environment
+HOMEBREW_PREFIX = /usr/local
 # automatic
 +D = $(patsubst %/,%,$(dir $+))
 # automatic
 +F = $(notdir $+)
 # environment
-__CF_USER_TEXT_ENCODING = 0x1F5:0:2
+HOMEBREW_REPOSITORY = /usr/local/Homebrew
+# environment
+__CF_USER_TEXT_ENCODING = 0x1F5:0x0:0x0
 # environment
 COMMAND_MODE = unix2003
 # default
@@ -137,7 +147,7 @@ MAKEFILES :=
 # environment
 LC_ALL = C
 # environment
-SECURITYSESSIONID = 186a3
+SECURITYSESSIONID = 18af4
 # automatic
 ^F = $(notdir $^)
 # default
@@ -149,9 +159,9 @@ MAKELEVEL := 0
 # environment
 LANG = C
 # environment
-VSCODE_PID = 425
+VSCODE_PID = 38356
 # variable set hash-table stats:
-# Load=68/1024=7%, Rehash=0, Collisions=2/92=2%
+# Load=74/1024=7%, Rehash=0, Collisions=2/98=2%
 
 # Pattern-specific Variable Values
 
@@ -159,7 +169,7 @@ VSCODE_PID = 425
 
 # Directories
 
-# . (device 16777224, inode 1202841): 22 files, no impossibilities.
+# . (device 16777223, inode 5639872): 22 files, no impossibilities.
 
 # 22 files, no impossibilities in 1 directories.
 
@@ -187,7 +197,7 @@ all:
 # Not a target:
 Makefile:
 #  Implicit rule search has been done.
-#  Last modified 2022-09-19 09:07:49
+#  Last modified 2023-05-21 06:06:27
 #  File has been updated.
 #  Successfully updated.
 # variable set hash-table stats:
@@ -236,6 +246,8 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Tue May  9 23:27:47 2023
+# Finished Make data base on Sun May 28 13:51:34 2023
 
  
+make: *** No rule to make target `all'.  Stop.
+
