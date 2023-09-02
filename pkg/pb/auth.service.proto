@@ -4,7 +4,6 @@ package auth;
 
 import "google/protobuf/empty.proto";
 
-
 option go_package = "pkg/pb";
 
 // Generated according to https://cloud.google.com/apis/design/standard_methods

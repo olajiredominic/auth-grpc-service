@@ -227,6 +227,7 @@ type UserPermissionsWithAfterToPB interface {
 }
 
 type UserORM struct {
+	Bio       string
 	CreatedAt *time.Time
 	Email     string
 	Firstname string
@@ -266,6 +267,7 @@ func (m *User) ToORM(ctx context.Context) (UserORM, error) {
 	to.Token = m.Token
 	to.Role = m.Role
 	to.ImageUrl = m.ImageUrl
+	to.Bio = m.Bio
 	if m.CreatedAt != nil {
 		t := m.CreatedAt.AsTime()
 		to.CreatedAt = &t
@@ -300,6 +302,7 @@ func (m *UserORM) ToPB(ctx context.Context) (User, error) {
 	to.Token = m.Token
 	to.Role = m.Role
 	to.ImageUrl = m.ImageUrl
+	to.Bio = m.Bio
 	if m.CreatedAt != nil {
 		to.CreatedAt = timestamppb.New(*m.CreatedAt)
 	}
@@ -1268,6 +1271,10 @@ func DefaultApplyFieldMaskUser(ctx context.Context, patchee *User, patcher *User
 		}
 		if f == prefix+"ImageUrl" {
 			patchee.ImageUrl = patcher.ImageUrl
+			continue
+		}
+		if f == prefix+"Bio" {
+			patchee.Bio = patcher.Bio
 			continue
 		}
 		if !updatedCreatedAt && strings.HasPrefix(f, prefix+"CreatedAt.") {

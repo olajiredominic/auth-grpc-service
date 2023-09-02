@@ -7,7 +7,7 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 
 # This program built for i386-apple-darwin11.3.0
 
-# Make data base, printed on Sun May 28 13:51:34 2023
+# Make data base, printed on Sat Sep  2 16:00:48 2023
 
 # Variables
 
@@ -15,6 +15,8 @@ make all --print-data-base --no-builtin-variables --no-builtin-rules --question
 <D = $(patsubst %/,%,$(dir $<))
 # automatic
 ?F = $(notdir $?)
+# environment
+ELECTRON_NO_ATTACH_CONSOLE = 1
 # environment
 VSCODE_CRASH_REPORTER_PROCESS_TYPE = extensionHost
 # environment
@@ -42,25 +44,27 @@ __CFBundleIdentifier = com.microsoft.VSCode
 # environment
 INFOPATH = /usr/local/share/info:
 # environment
-VSCODE_CWD = /
+VSCODE_CWD = /Users/account/Desktop/City-Hotels/ch-auth-svc
 # environment
 GOPROXY = https://proxy.golang.org,direct
 # environment
-PATH = /Users/account/.nvm/versions/node/v18.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+PATH = /Users/account/anaconda3/bin:/Users/account/anaconda3/condabin:/Users/account/.nvm/versions/node/v18.15.0/bin:/usr/local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
 # environment
 GOPATH = /Users/user/go
 # environment
 NVM_BIN = /Users/account/.nvm/versions/node/v18.15.0/bin
 # environment
-LaunchInstanceID = BEB98402-DB0E-403E-A979-601E75E54B4D
+LaunchInstanceID = 2E3691F1-F3B1-47EC-9F3B-72EA20E4D8AC
 # environment
 ELECTRON_RUN_AS_NODE = 1
 # default
 .FEATURES := target-specific order-only second-expansion else-if archives jobserver check-symlink
 # environment
-SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.2HqbIf3SqO/Listeners
+SSH_AUTH_SOCK = /private/tmp/com.apple.launchd.yF6LUFd755/Listeners
 # automatic
 %F = $(notdir $%)
+# environment
+CONDA_EXE = /Users/account/anaconda3/bin/conda
 # environment
 PWD = /Users/account/Desktop/City-Hotels/ch-auth-svc
 # environment
@@ -76,11 +80,15 @@ HOME = /Users/account
 # default
 MAKEFILEPATH = $(shell /usr/bin/xcode-select -print-path 2>/dev/null || echo /Developer)/Makefiles
 # environment
-VSCODE_CODE_CACHE_PATH = /Users/account/Library/Application Support/Code/CachedData/b3e4e68a0bc097f0ae7907b217c1119af9e03435
+VSCODE_CLI = 1
+# environment
+VSCODE_CODE_CACHE_PATH = /Users/account/Library/Application Support/Code/CachedData/6c3e3dba23e8fadc360aed75ce363ba185c49794
 # environment
 LOGNAME = account
 # environment
 APPLICATION_INSIGHTS_NO_DIAGNOSTIC_CHANNEL = 1
+# environment
+CONDA_PROMPT_MODIFIER = (base) 
 # environment
 NVM_CD_FLAGS = -q
 # environment
@@ -88,26 +96,31 @@ VSCODE_HANDLES_UNCAUGHT_ERRORS = true
 # automatic
 ^D = $(patsubst %/,%,$(dir $^))
 # environment
+CONDA_DEFAULT_ENV = base
+# environment
 XPC_FLAGS = 0x0
 # default
 MAKE = $(MAKE_COMMAND)
 # default
 MAKECMDGOALS := all
 # environment
-SHLVL = 1
-# environment
-VSCODE_CRASH_REPORTER_SANDBOXED_HINT = 1
+SHLVL = 3
 # default
 MAKE_VERSION := 3.81
 # environment
 USER = account
 # makefile
 .DEFAULT_GOAL := proto
+# environment
+TERM_SESSION_ID = 9AAA2502-0DFA-4B0C-9904-8F7D9A29DCC6
 # automatic
 %D = $(patsubst %/,%,$(dir $%))
+# environment
+CONDA_SHLVL = 1
 # default
- 
 MAKE_COMMAND := /Library/Developer/CommandLineTools/usr/bin/make
+# environment
+TERM_PROGRAM = Apple_Terminal
 # default
 .VARIABLES := 
 # environment
@@ -115,7 +128,7 @@ TMPDIR = /var/folders/pr/_qw7l6hx24jfgr62gpg1lrz00000gn/T/
 # automatic
 *F = $(notdir $*)
 # environment
-VSCODE_IPC_HOOK = /Users/account/Library/Application Support/Code/1.78-main.sock
+VSCODE_IPC_HOOK = /Users/account/Library/Application Support/Code/1.81-main.sock
 # environment
 MallocNanoZone = 0
 # makefile
@@ -125,9 +138,11 @@ MFLAGS = -Rrqp
 # automatic
 *D = $(patsubst %/,%,$(dir $*))
 # environment
+TERM_PROGRAM_VERSION = 445
+# environment
 NVM_DIR = /Users/account/.nvm
 # environment
-XPC_SERVICE_NAME = application.com.microsoft.VSCode.5732133.5732139
+XPC_SERVICE_NAME = application.com.microsoft.VSCode.18172905.18172911.54FEDFA8-B15B-4F36-A238-D31AC21DBD88
 # environment
 HOMEBREW_PREFIX = /usr/local
 # automatic
@@ -147,7 +162,9 @@ MAKEFILES :=
 # environment
 LC_ALL = C
 # environment
-SECURITYSESSIONID = 18af4
+CONDA_PYTHON_EXE = /Users/account/anaconda3/bin/python
+# environment
+SECURITYSESSIONID = 186a4
 # automatic
 ^F = $(notdir $^)
 # default
@@ -157,11 +174,15 @@ SUFFIXES :=
 # environment
 MAKELEVEL := 0
 # environment
-LANG = C
+CONDA_PREFIX = /Users/account/anaconda3
 # environment
-VSCODE_PID = 38356
+TERM = xterm-256color
+# environment
+VSCODE_PID = 400
+# environment
+LANG = C
 # variable set hash-table stats:
-# Load=74/1024=7%, Rehash=0, Collisions=2/98=2%
+# Load=85/1024=8%, Rehash=0, Collisions=3/109=3%
 
 # Pattern-specific Variable Values
 
@@ -169,9 +190,9 @@ VSCODE_PID = 38356
 
 # Directories
 
-# . (device 16777223, inode 5639872): 22 files, no impossibilities.
+# . (device 16777225, inode 5639872): 23 files, no impossibilities.
 
-# 22 files, no impossibilities in 1 directories.
+# 23 files, no impossibilities in 1 directories.
 
 # Implicit Rules
 
@@ -246,7 +267,7 @@ gorm-proto:
 # strcache size: total = 4096 / max = 4096 / min = 4096 / avg = 4096
 # strcache free: total = 4087 / max = 4087 / min = 4087 / avg = 4087
 
-# Finished Make data base on Sun May 28 13:51:34 2023
+# Finished Make data base on Sat Sep  2 16:00:48 2023
 
  
 make: *** No rule to make target `all'.  Stop.

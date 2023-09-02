@@ -40,6 +40,7 @@ message User {
     string Token  = 8;
     string Role  = 9;
     string ImageUrl  = 10 [json_name="imageurl"];
-    google.protobuf.Timestamp  CreatedAt  = 11 [json_name="created_at"];
-    google.protobuf.Timestamp  UpdatedAt  = 12 [json_name="updated_at"];
+    string Bio  = 11 [json_name="bio"];
+    google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
+    google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
   }
