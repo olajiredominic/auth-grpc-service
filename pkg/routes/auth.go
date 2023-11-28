@@ -131,6 +131,7 @@ func (h *Handler) SocialLogin(ctx context.Context, req *pb.SocialLoginRequest) (
 			Email:     req.Email,
 			Firstname: req.FirstName,
 			Lastname:  req.LastName,
+			ImageUrl:  req.Imageurl,
 			Role:      "USER",
 		}
 
@@ -159,6 +160,7 @@ func (h *Handler) SocialLogin(ctx context.Context, req *pb.SocialLoginRequest) (
 		Message: "Login Successful",
 	}, nil
 }
+
 func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.LoginUserResponse, error) {
 
 	var user models.UserORM

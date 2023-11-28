@@ -39,6 +39,7 @@ message SocialLoginRequest {
   string LastName = 3;
   string Token = 4;
   string Issuer = 5;
+  string Imageurl = 6;
 }
 
 message LoginUserResponse {
