@@ -138,3 +138,46 @@ func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*e
 	return &emptypb.Empty{}, nil
 
 }
+
+func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) (*emptypb.Empty, error) {
+	// Check if user with the provided ID already exists
+	var existingUser models.UserORM
+	query := h.DB.First(&existingUser, "id = ?", req.Id)
+	if query.Error != nil {
+		log.Println("User not found for verification:", query.Error)
+		return nil, status.Errorf(codes.NotFound, "User not found for verification")
+	}
+
+	// Perform additional verification logic based on IdType
+	switch req.IdType {
+	case models.IdType_DRIVERS_LICENCE:
+		// Perform verification logic for driver's license
+		// ...
+
+	case models.IdType_PASSPORT:
+		// Perform verification logic for passport
+		// ...
+
+	case models.IdType_IDENTITY_CARD:
+		// Perform verification logic for identity card
+		// ...
+
+	default:
+		// Invalid IdType
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid IdType")
+	}
+
+	// Perform additional verification logic based on CountryCode
+	// ...
+
+	// Update user verification status in the database
+	// For example, you might set a field like IsVerified to true in the UserORM model
+	existingUser.IsVerified = true
+	updateQuery := h.DB.Save(&existingUser)
+	if updateQuery.Error != nil {
+		log.Println("Failed to update user verification status:", updateQuery.Error)
+		return nil, status.Errorf(codes.Internal, "Failed to update user verification status")
+	}
+
+	return &emptypb.Empty{}, nil
+}

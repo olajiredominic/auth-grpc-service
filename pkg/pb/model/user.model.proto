@@ -44,3 +44,16 @@ message User {
     google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
   }
+enum IdType {
+  DRIVERS_LICENCE = 0;
+  PASSPORT = 1;
+  IDENTITY_CARD =2;
+}
+message UserVerification {
+option (gorm.opts).ormable = true;
+ string CountryCode = 1;
+ IdType IdType = 2;
+ string Selfie =3;
+ string Id =4;
+
+}
