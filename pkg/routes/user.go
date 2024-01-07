@@ -142,7 +142,7 @@ func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*e
 func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) (*emptypb.Empty, error) {
 	// Check if user with the provided ID already exists
 	var existingUser models.UserORM
-	query := h.DB.First(&existingUser, "id = ?", req.Id)
+	query := h.DB.First(&existingUser, "id = ?", req.User)
 	if query.Error != nil {
 		log.Println("User not found for verification:", query.Error)
 		return nil, status.Errorf(codes.NotFound, "User not found for verification")
@@ -172,7 +172,8 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 
 	// Update user verification status in the database
 	// For example, you might set a field like IsVerified to true in the UserORM model
-	existingUser.IsVerified = true
+	h.DB.Save(&req)
+	existingUser.VerificationStatus = int32(models.VerificationStatus_VERIFIED)
 	updateQuery := h.DB.Save(&existingUser)
 	if updateQuery.Error != nil {
 		log.Println("Failed to update user verification status:", updateQuery.Error)

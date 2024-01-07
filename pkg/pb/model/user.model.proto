@@ -43,17 +43,27 @@ message User {
     string Bio  = 11 [json_name="bio"];
     google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
-  }
+    VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
+}
 enum IdType {
   DRIVERS_LICENCE = 0;
   PASSPORT = 1;
   IDENTITY_CARD =2;
 }
+
+enum VerificationStatus {
+  PENDING = 0;
+  PROCESSING = 1;
+  VERIFIED = 2;
+  FAILED = 3;
+}
+
 message UserVerification {
-option (gorm.opts).ormable = true;
+ option (gorm.opts).ormable = true;
  string CountryCode = 1;
  IdType IdType = 2;
- string Selfie =3;
- string Id =4;
-
+ string Selfie = 3;
+ string IdFilePath = 4;
+ string IdNumber = 5;
+ User User = 6 [(gorm.field).belongs_to = {}];
 }
