@@ -4,6 +4,7 @@ import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
 option go_package = "pkg/pb/model";
+// option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;
@@ -19,12 +20,19 @@ message Address {
   google.protobuf.Timestamp  UpdatedAt  = 10;
 }
 
-message UserPermissions {
+enum Status {
+  INACTIVE = 0;
+  ACTIVE = 1;
+}
+
+message UserPermission {
   option (gorm.opts).ormable = true;
 	User User    = 1 [(gorm.field).belongs_to = {}];
 	string Permission = 2;
   google.protobuf.Timestamp  CreatedAt  = 3;
   google.protobuf.Timestamp  UpdatedAt  = 4;
+  Status Status = 5;
+  int32 Id = 6 [(gorm.field).tag = {type: "integer" primary_key: true}];
 }
 
 message User {
@@ -43,4 +51,27 @@ message User {
     string Bio  = 11 [json_name="bio"];
     google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
-  }
+    VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
+}
+enum IdType {
+  DRIVERS_LICENCE = 0;
+  PASSPORT = 1;
+  IDENTITY_CARD =2;
+}
+
+enum VerificationStatus {
+  PENDING = 0;
+  PROCESSING = 1;
+  VERIFIED = 2;
+  FAILED = 3;
+}
+
+message UserVerification {
+ option (gorm.opts).ormable = true;
+ string CountryCode = 1;
+ IdType IdType = 2;
+ string Selfie = 3;
+ string IdFilePath = 4;
+ string IdNumber = 5;
+ User User = 6 [(gorm.field).belongs_to = {}];
+}
