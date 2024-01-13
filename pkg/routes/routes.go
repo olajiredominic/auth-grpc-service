@@ -25,7 +25,7 @@ func Init(url string) Handler {
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&models.UserORM{}, &models.AddressORM{}, &models.UserPermissionsORM{})
+	db.AutoMigrate(&models.UserORM{}, &models.AddressORM{}, &models.UserPermissionORM{})
 
 	return Handler{db}
 }

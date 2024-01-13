@@ -4,6 +4,7 @@ import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
 option go_package = "pkg/pb/model";
+// option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;
@@ -19,12 +20,19 @@ message Address {
   google.protobuf.Timestamp  UpdatedAt  = 10;
 }
 
-message UserPermissions {
+enum Status {
+  INACTIVE = 0;
+  ACTIVE = 1;
+}
+
+message UserPermission {
   option (gorm.opts).ormable = true;
 	User User    = 1 [(gorm.field).belongs_to = {}];
 	string Permission = 2;
   google.protobuf.Timestamp  CreatedAt  = 3;
   google.protobuf.Timestamp  UpdatedAt  = 4;
+  Status Status = 5;
+  int32 Id = 6 [(gorm.field).tag = {type: "integer" primary_key: true}];
 }
 
 message User {

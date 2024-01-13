@@ -8,6 +8,7 @@ package pb
 
 import (
 	context "context"
+	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -28,9 +29,12 @@ type AuthServiceClient interface {
 	ChangePassword(ctx context.Context, in *ChangePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ForgotPassword(ctx context.Context, in *ForgotPasswordRequest, opts ...grpc.CallOption) (*ForgotPasswordResponse, error)
 	ResetPassword(ctx context.Context, in *UpdatePasswordRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	VerifyOTP(ctx context.Context, in *VerifyOTPRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AddUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*model.UserPermission, error)
+	DeleteUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateUserPermissions(ctx context.Context, in *UpdateUserPermissionsRequest, opts ...grpc.CallOption) (*UpdateUserPermissionsResponse, error)
 }
 
 type authServiceClient struct {
@@ -86,15 +90,6 @@ func (c *authServiceClient) ResetPassword(ctx context.Context, in *UpdatePasswor
 	return out, nil
 }
 
-func (c *authServiceClient) HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/auth.AuthService/HasPermission", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *authServiceClient) ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error) {
 	out := new(ValidateTokenResponse)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/ValidateToken", in, out, opts...)
@@ -113,6 +108,42 @@ func (c *authServiceClient) VerifyOTP(ctx context.Context, in *VerifyOTPRequest,
 	return out, nil
 }
 
+func (c *authServiceClient) HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/HasPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) AddUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*model.UserPermission, error) {
+	out := new(model.UserPermission)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/AddUserPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) DeleteUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/DeleteUserPermission", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authServiceClient) UpdateUserPermissions(ctx context.Context, in *UpdateUserPermissionsRequest, opts ...grpc.CallOption) (*UpdateUserPermissionsResponse, error) {
+	out := new(UpdateUserPermissionsResponse)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/UpdateUserPermissions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations should embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -122,9 +153,12 @@ type AuthServiceServer interface {
 	ChangePassword(context.Context, *ChangePasswordRequest) (*emptypb.Empty, error)
 	ForgotPassword(context.Context, *ForgotPasswordRequest) (*ForgotPasswordResponse, error)
 	ResetPassword(context.Context, *UpdatePasswordRequest) (*emptypb.Empty, error)
-	HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error)
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	VerifyOTP(context.Context, *VerifyOTPRequest) (*emptypb.Empty, error)
+	HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error)
+	AddUserPermission(context.Context, *model.UserPermission) (*model.UserPermission, error)
+	DeleteUserPermission(context.Context, *model.UserPermission) (*emptypb.Empty, error)
+	UpdateUserPermissions(context.Context, *UpdateUserPermissionsRequest) (*UpdateUserPermissionsResponse, error)
 }
 
 // UnimplementedAuthServiceServer should be embedded to have forward compatible implementations.
@@ -146,14 +180,23 @@ func (UnimplementedAuthServiceServer) ForgotPassword(context.Context, *ForgotPas
 func (UnimplementedAuthServiceServer) ResetPassword(context.Context, *UpdatePasswordRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ResetPassword not implemented")
 }
-func (UnimplementedAuthServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
-}
 func (UnimplementedAuthServiceServer) ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ValidateToken not implemented")
 }
 func (UnimplementedAuthServiceServer) VerifyOTP(context.Context, *VerifyOTPRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyOTP not implemented")
+}
+func (UnimplementedAuthServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
+}
+func (UnimplementedAuthServiceServer) AddUserPermission(context.Context, *model.UserPermission) (*model.UserPermission, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddUserPermission not implemented")
+}
+func (UnimplementedAuthServiceServer) DeleteUserPermission(context.Context, *model.UserPermission) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteUserPermission not implemented")
+}
+func (UnimplementedAuthServiceServer) UpdateUserPermissions(context.Context, *UpdateUserPermissionsRequest) (*UpdateUserPermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserPermissions not implemented")
 }
 
 // UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -257,24 +300,6 @@ func _AuthService_ResetPassword_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _AuthService_HasPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HasPermissionRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServiceServer).HasPermission(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/auth.AuthService/HasPermission",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServiceServer).HasPermission(ctx, req.(*HasPermissionRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _AuthService_ValidateToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ValidateTokenRequest)
 	if err := dec(in); err != nil {
@@ -311,6 +336,78 @@ func _AuthService_VerifyOTP_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_HasPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HasPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).HasPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/HasPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).HasPermission(ctx, req.(*HasPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_AddUserPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(model.UserPermission)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).AddUserPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/AddUserPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).AddUserPermission(ctx, req.(*model.UserPermission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_DeleteUserPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(model.UserPermission)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).DeleteUserPermission(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/DeleteUserPermission",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).DeleteUserPermission(ctx, req.(*model.UserPermission))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthService_UpdateUserPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserPermissionsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).UpdateUserPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/UpdateUserPermissions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).UpdateUserPermissions(ctx, req.(*UpdateUserPermissionsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -339,16 +436,28 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _AuthService_ResetPassword_Handler,
 		},
 		{
-			MethodName: "HasPermission",
-			Handler:    _AuthService_HasPermission_Handler,
-		},
-		{
 			MethodName: "ValidateToken",
 			Handler:    _AuthService_ValidateToken_Handler,
 		},
 		{
 			MethodName: "VerifyOTP",
 			Handler:    _AuthService_VerifyOTP_Handler,
+		},
+		{
+			MethodName: "HasPermission",
+			Handler:    _AuthService_HasPermission_Handler,
+		},
+		{
+			MethodName: "AddUserPermission",
+			Handler:    _AuthService_AddUserPermission_Handler,
+		},
+		{
+			MethodName: "DeleteUserPermission",
+			Handler:    _AuthService_DeleteUserPermission_Handler,
+		},
+		{
+			MethodName: "UpdateUserPermissions",
+			Handler:    _AuthService_UpdateUserPermissions_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

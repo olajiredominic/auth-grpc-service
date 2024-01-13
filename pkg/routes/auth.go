@@ -110,8 +110,8 @@ func (h *Handler) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*emp
 
 func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*emptypb.Empty, error) {
 
-	var userPermission models.UserPermissionsORM
-	query := h.DB.First(&userPermission, "permission = ? AND user_id = ?", req.Permission, req.Id)
+	var userPermission models.UserPermissionORM
+	query := h.DB.First(&userPermission, "permission = ? AND user_id = ? AND status", req.Permission, req.Id, int32(models.Status_ACTIVE))
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.Unauthenticated,
@@ -226,4 +226,121 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 	h.DB.Save(user)
 
 	return &emptypb.Empty{}, nil
+}
+
+func (h *Handler) AddUserPermission(ctx context.Context, req *models.UserPermission) (*models.UserPermission, error) {
+
+	var role models.UserPermissionORM
+	query := h.DB.First(&role, "user_id = ? AND permission = ? AND status = ?", req.User.Id, req.Permission, int32(models.Status_ACTIVE))
+	if query.Error != nil && query.Error.Error() != "record not found" {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.FailedPrecondition,
+			"User already has permission")
+	}
+
+	now := time.Now()
+
+	role.UserId = &req.User.Id
+	role.Permission = req.Permission
+	role.CreatedAt = &now
+	role.UpdatedAt = &now
+	role.Status = int32(models.Status_ACTIVE)
+	h.DB.Create(&role)
+
+	permission, _ := role.ToPB(ctx)
+
+	return &permission, nil
+}
+
+func (h *Handler) DeleteUserPermission(ctx context.Context, req *models.UserPermission) (*emptypb.Empty, error) {
+
+	var role models.UserPermissionORM
+	query := h.DB.First(&role, "userid = ? AND permission = ? AND status", req.User.Id, req.Permission, int32(models.Status_ACTIVE))
+	if query.Error != nil {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.FailedPrecondition,
+			"User does not have permission")
+	}
+
+	now := time.Now()
+
+	role.UserId = &req.User.Id
+	role.Permission = req.Permission
+	role.Status = int32(models.Status_INACTIVE)
+	role.UpdatedAt = &now
+	h.DB.Save(&role)
+
+	return &emptypb.Empty{}, nil
+}
+
+func (h *Handler) UpdateUserPermissions(ctx context.Context, req *pb.UpdateUserPermissionsRequest) (*pb.UpdateUserPermissionsResponse, error) {
+
+	var permissions []*models.UserPermissionORM
+	h.DB.Find(&permissions, "user_id = ? AND status = ?", req.UserId, int32(models.Status_ACTIVE))
+
+	var activePermissions []string
+	for _, obj := range permissions {
+		permission, err := obj.ToPB(ctx)
+		if err != nil {
+			return nil, status.Errorf(codes.Internal,
+				"Could not convert user %s", err)
+		}
+
+		activePermissions = append(activePermissions, permission.Permission)
+	}
+
+	added, removed := findPermissionChanges(activePermissions, req.Permissions)
+
+	now := time.Now()
+	for _, v := range added {
+		permission := &models.UserPermissionORM{}
+
+		permission.UserId = &req.UserId
+		permission.Permission = v
+		permission.CreatedAt = &now
+		permission.UpdatedAt = &now
+		permission.Status = int32(models.Status_ACTIVE)
+		h.DB.Create(&permission)
+
+	}
+
+	for _, v := range removed {
+		var permission models.UserPermissionORM
+		h.DB.First(&permission, "user_id = ? OR permission = ? OR status = ?", req.UserId, v, int32(models.Status_ACTIVE))
+
+		permission.UserId = &req.UserId
+		permission.Permission = v
+		permission.UpdatedAt = &now
+		permission.Status = int32(models.Status_INACTIVE)
+		h.DB.Save(&permission)
+	}
+
+	return &pb.UpdateUserPermissionsResponse{
+		Added:   added,
+		Removed: removed,
+	}, nil
+}
+
+func findPermissionChanges(oldList, newList []string) ([]string, []string) {
+	oldMap := make(map[string]bool)
+	for _, item := range oldList {
+		oldMap[item] = true
+	}
+
+	added := []string{}
+	removed := []string{}
+
+	for _, item := range newList {
+		if _, exists := oldMap[item]; !exists {
+			added = append(added, item)
+		} else {
+			delete(oldMap, item)
+		}
+	}
+
+	for item := range oldMap {
+		removed = append(removed, item)
+	}
+
+	return added, removed
 }

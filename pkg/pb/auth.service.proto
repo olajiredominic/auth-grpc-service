@@ -1,10 +1,12 @@
 syntax = "proto3";
 
 package auth;
+option go_package = "pkg/pb";
 
 import "google/protobuf/empty.proto";
+import "pkg/pb/model/user.model.proto";
 
-option go_package = "pkg/pb";
+
 
 // Generated according to https://cloud.google.com/apis/design/standard_methods
 service AuthService {
@@ -19,11 +21,19 @@ service AuthService {
 
   rpc ResetPassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {}
 
-  rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
-
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) { }
-
+  
   rpc VerifyOTP(VerifyOTPRequest) returns (google.protobuf.Empty) { }
+  
+  rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
+  
+  rpc AddUserPermission(UserPermission) returns (UserPermission) { }
+
+  rpc DeleteUserPermission(UserPermission) returns (google.protobuf.Empty) { }
+
+  rpc UpdateUserPermissions(UpdateUserPermissionsRequest) returns (UpdateUserPermissionsResponse) { }
+
+  // rpc CreateServiceRole(CreateServiceRoleRequest) returns (CreateServiceRoleResponse) { }
 }
 
 message LoginUserRequest {
@@ -79,12 +89,6 @@ message UpdatePasswordRequest {
   string Password = 3;
 }
 
-message HasPermissionRequest {
-  // Checks an ID has a certain permission
-  string Id = 1;
-  string Permission = 2;
-}
-
 message ValidateTokenRequest {
   // Checks auth token is valid
   string Token = 1;
@@ -100,6 +104,51 @@ message VerifyOTPRequest {
   // Checks auth token is valid
   string LoginId = 1;
   string Token = 2;
+}
+
+// message CreateServiceRoleRequest {
+//   // Checks an ID has a certain permission
+//   string Id = 1;
+//   string Title = 3;
+//   string ServiceId = 2;
+//   repeated string Permssions = 4;
+// }
+
+// message CreateServiceRoleResponse {
+//   // Checks an ID has a certain permission
+//   string Id = 1;
+// }
+
+
+message HasPermissionRequest {
+  // Checks an ID has a certain permission
+  string Id = 1;
+  string Permission = 2;
+}
+
+message AdduserPermissionRequest {
+  // Checks an ID has a certain permission
+  string Id = 1;
+  string UserId = 2;
+  string Permission = 3;
+}
+
+message AdduserPermissionResponse {
+  // Checks an ID has a certain permission
+  string Id = 1;
+}
+
+message UpdateUserPermissionsRequest {
+  // Checks an ID has a certain permission
+  string Id = 1;
+  string UserId = 2;
+  repeated string Permissions = 3;
+}
+
+message UpdateUserPermissionsResponse {
+  // Checks an ID has a certain permission
+  repeated string Added = 1;
+  repeated string Removed = 2;
 }
 
 
