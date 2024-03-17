@@ -74,7 +74,7 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 func (h *Handler) ValidateToken(ctx context.Context, req *pb.ValidateTokenRequest) (*pb.ValidateTokenResponse, error) {
 	payload, error := helpers.ValidateJWTToken(req.Token)
 	if payload == "" || error != nil {
-		log.Println("Error validating token ", req.Token, error.Error())
+		log.Println("Error validating token ", req.Token)
 		return nil, status.Errorf(codes.Unauthenticated,
 			"Invalid authentication token or expired")
 	}
