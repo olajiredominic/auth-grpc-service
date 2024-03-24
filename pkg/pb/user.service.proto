@@ -48,9 +48,7 @@ message ListUsersResponse {
   repeated User Users = 1;
 
   // Token to retrieve the next page of results, or empty if there are no more results in the list.
-  int32 Limit = 2;
-
-  int32 Page = 3;
+  Meta Meta  = 2;
 }
 
 message GetUserRequest {
