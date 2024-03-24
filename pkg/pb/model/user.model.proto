@@ -3,8 +3,8 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "pkg/pb/model";
-// option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
+// option go_package = "pkg/pb/model";
+option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;
@@ -74,4 +74,12 @@ message UserVerification {
  string IdFilePath = 4;
  string IdNumber = 5;
  User User = 6 [(gorm.field).belongs_to = {}];
+}
+
+message Meta {
+  int32 TotalPages = 1;
+  int32 Limit = 2;
+  int32 CurrentPage = 3;
+  int32 NextPage = 4;
+  int32 TotalCount =5;
 }

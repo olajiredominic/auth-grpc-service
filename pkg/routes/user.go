@@ -73,8 +73,46 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 	// TODO: Implement search filters
 	var usersORMList []*models.UserORM
 	var users []*models.User
+	var totalCount int64
+	var totalPages int64
+	var nextPage int64
 
-	query := h.DB.Find(&usersORMList)
+	// Set up pagination options
+	if req.Limit == 0 {
+		req.Limit = 10
+	}
+	if req.Page == 0 {
+		req.Page = 1
+	}
+
+	offset := (req.Page - 1) * req.Limit
+	query := h.DB.Model(&models.UserORM{})
+
+	if req.Role != nil && *req.Role != "" {
+		query = query.Where("role = ?", req.Role)
+	}
+
+	if req.Name != nil && *req.Name != "" {
+		query = query.Where("firstname LIKE ? OR lastname LIKE ?", "%"+*req.Name+"%", "%"+*req.Name+"%")
+	}
+
+	if req.Email != nil && *req.Email != "" {
+		query = query.Where("email  LIKE ? ", "%"+*req.Email+"%")
+	}
+	// Query total count of users
+	if err := query.Count(&totalCount).Error; err != nil {
+		log.Println(err)
+		return nil, status.Errorf(codes.Internal,
+			"Could not convert user %s", err)
+	}
+
+	// Calculate total pages
+	totalPages = totalCount / int64(req.Limit)
+	if totalCount%int64(req.Limit) != 0 {
+		totalPages++
+	}
+
+	query.Offset(int(offset)).Limit(int(req.Limit)).Find(&usersORMList)
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.Internal,
@@ -91,10 +129,21 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 		users = append(users, &userObj)
 	}
 
+	if req.Page < int32(totalPages) {
+		nextPage = int64(req.Page) + 1
+	} else {
+		nextPage = 1
+	}
+
 	return &pb.ListUsersResponse{
 		Users: users,
-		Limit: 10,
-		Page:  1,
+		Meta: &models.Meta{
+			Limit:       req.Limit,
+			CurrentPage: req.Page,
+			TotalCount:  int32(totalCount),
+			TotalPages:  int32(totalPages),
+			NextPage:    int32(nextPage),
+		},
 	}, nil
 }
 
