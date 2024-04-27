@@ -51,16 +51,6 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 }
 
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.User, error) {
-	// Define a struct to hold the specific columns you want to retrieve
-	// type UserColumns struct {
-	// 	Id        string
-	// 	Email     string
-	// 	Firstname string
-	// 	Lastname  string
-	// 	Role      string
-	// 	ImaageUrl string
-	// 	Username  string
-	// }
 
 	var user models.UserORM
 	query := h.DB.Select("id, email, firstname, lastname, role, image_url, username, bio, verification_status").First(&user, "id = ?", req.Id)
