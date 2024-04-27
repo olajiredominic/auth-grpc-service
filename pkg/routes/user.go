@@ -53,20 +53,26 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.User, error) {
 
 	var user models.UserORM
-	query := h.DB.First(&user, "id = ?", req.Id)
+	query := h.DB.Select("id, email, firstname, lastname, role, image_url, username, bio, verification_status").First(&user, "id = ?", req.Id)
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.NotFound,
-			"User not found")
-	}
-	userData, err := user.ToPB(ctx)
-	if err != nil {
-		log.Println(query.Error)
-		return nil, status.Errorf(codes.Internal,
-			"Unable to convert user ")
+		return nil, status.Errorf(codes.NotFound, "User not found")
 	}
 
-	return &userData, nil
+	// Convert the UserColumns struct to a pb.User object
+	userData := &models.User{
+		Id:                 user.Id,
+		Email:              user.Email,
+		Firstname:          user.Firstname,
+		Lastname:           user.Lastname,
+		Role:               user.Role,
+		ImageUrl:           user.ImageUrl,
+		Username:           user.Username,
+		Bio:                user.Bio,
+		VerificationStatus: models.VerificationStatus(user.VerificationStatus),
+	}
+
+	return userData, nil
 }
 
 func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
