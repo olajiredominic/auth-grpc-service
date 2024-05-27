@@ -53,6 +53,7 @@ message User {
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
     VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
 }
+
 enum IdType {
   DRIVERS_LICENCE = 0;
   PASSPORT = 1;
@@ -67,14 +68,15 @@ enum VerificationStatus {
 }
 
 message UserVerification {
- option (gorm.opts).ormable = true;
- string CountryCode = 1;
- IdType IdType = 2;
- string Selfie = 3;
- string IdFilePath = 4;
- string IdNumber = 5;
- User User = 6 [(gorm.field).belongs_to = {}];
-}
+  option (gorm.opts).ormable = true;
+  string CountryCode = 1;
+  IdType IdType = 2;
+  string Selfie = 3;
+  string IdFilePath = 4;
+  string IdNumber = 5;
+  User User = 6 [(gorm.field).belongs_to = {association_foreignkey: "id"}];
+ }
+ 
 
 message Meta {
   int32 TotalPages = 1;
