@@ -2,11 +2,13 @@ package routes
 
 import (
 	"context"
+	"errors"
 	"log"
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
 	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
+	"gorm.io/gorm"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc/codes"
@@ -53,26 +55,20 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.User, error) {
 
 	var user models.UserORM
-	query := h.DB.Select("id, email, firstname, lastname, role, image_url, username, bio, verification_status").First(&user, "id = ?", req.Id)
+	query := h.DB.First(&user, "id = ?", req.Id)
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.NotFound, "User not found")
+		return nil, status.Errorf(codes.NotFound,
+			"User not found")
+	}
+	userData, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.Internal,
+			"Unable to convert user ")
 	}
 
-	// Convert the UserColumns struct to a pb.User object
-	userData := &models.User{
-		Id:                 user.Id,
-		Email:              user.Email,
-		Firstname:          user.Firstname,
-		Lastname:           user.Lastname,
-		Role:               user.Role,
-		ImageUrl:           user.ImageUrl,
-		Username:           user.Username,
-		Bio:                user.Bio,
-		VerificationStatus: models.VerificationStatus(user.VerificationStatus),
-	}
-
-	return userData, nil
+	return &userData, nil
 }
 
 func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
@@ -255,4 +251,191 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	}
 
 	return &emptypb.Empty{}, nil
+}
+
+func (h *Handler) UpdateUserIDImage(ctx context.Context, req *pb.UpdateIDImageRequest) (*pb.UpdateIDImageResponse, error) {
+	// First, check if the user exists in UserORM
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserORM, create a new row
+			user.Id = req.UserId
+			// Assuming other necessary fields are set here
+			if err := h.DB.Create(&user).Error; err != nil {
+				log.Println("Error creating user ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Next, check if the user exists in UserVerificationORM
+	var verification models.UserVerificationORM
+	query = h.DB.First(&verification, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserVerificationORM, create a new row
+			verification.UserId = &req.UserId
+			verification.IdFilePath = req.IdImagePath
+			if err := h.DB.Create(&verification).Error; err != nil {
+				log.Println("Error creating user verification ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user verification ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists in UserVerificationORM, update the necessary fields
+		if err := h.DB.Model(&verification).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+			IdFilePath: req.IdImagePath,
+		}).Error; err != nil {
+			log.Println("Error updating user verification ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Convert the updated UserORM model back to a Pb model
+	updatedUser, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserORM to User model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user ID image")
+	}
+
+	// Create a response object and populate it with the necessary data
+	response := &pb.UpdateIDImageResponse{
+		User: &updatedUser, // Assuming pb.UpdateIDImageResponse has a User field
+	}
+
+	return response, nil
+}
+
+func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequest) (*pb.UpdateSelfieResponse, error) {
+	// First, check if the user exists in UserORM
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserORM, create a new row
+			user.Id = req.UserId
+			// Assuming other necessary fields are set here
+			if err := h.DB.Create(&user).Error; err != nil {
+				log.Println("Error creating user ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists, update the user details if necessary
+		// Assuming user.IDImagePath or other fields might need updates
+		// if err := h.DB.Save(&user).Error; err != nil {
+		// 	log.Println("Error updating user ", req.UserId, err)
+		// 	return nil, status.Errorf(codes.Internal, "Database error")
+		// }
+	}
+
+	// Next, check if the user exists in UserVerificationORM
+	var verification models.UserVerificationORM
+	query = h.DB.First(&verification, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserVerificationORM, create a new row
+			verification.UserId = &req.UserId
+			verification.Selfie = req.SelfiePath
+			if err := h.DB.Create(&verification).Error; err != nil {
+				log.Println("Error creating user verification ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user verification ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists in UserVerificationORM, update the necessary fields
+		if err := h.DB.Model(&verification).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+			Selfie: req.SelfiePath,
+		}).Error; err != nil {
+			log.Println("Error updating user verification ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Convert the updated UserORM model back to a Pb model
+	updatedUser, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserORM to User model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user Selfie image")
+	}
+
+	// Create a response object and populate it with the necessary data
+	response := &pb.UpdateSelfieResponse{
+		User: &updatedUser, // Assuming pb.UpdateSelfieResponse has a User field
+	}
+
+	return response, nil
+}
+
+func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumberRequest) (*pb.UpdateIDNumberResponse, error) {
+	// First, check if the user exists in UserORM
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserORM, create a new row
+			user.Id = req.UserId
+			// Assuming other necessary fields are set here
+			if err := h.DB.Create(&user).Error; err != nil {
+				log.Println("Error creating user ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Next, check if the user exists in UserVerificationORM
+	var verification models.UserVerificationORM
+	query = h.DB.First(&verification, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserVerificationORM, create a new row
+			verification.UserId = &req.UserId
+			verification.IdNumber = req.IdNumber
+			if err := h.DB.Create(&verification).Error; err != nil {
+				log.Println("Error creating user verification ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user verification ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists in UserVerificationORM, update the necessary fields
+		if err := h.DB.Model(&verification).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+			IdNumber: req.IdNumber,
+		}).Error; err != nil {
+			log.Println("Error updating user verification ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Convert the updated UserORM model back to a Pb model
+	updatedUser, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserORM to User model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user ID number")
+	}
+
+	// Create a response object and populate it with the necessary data
+	response := &pb.UpdateIDNumberResponse{
+		User: &updatedUser, // Assuming pb.UpdateIDNumberResponse has a User field
+	}
+
+	return response, nil
 }

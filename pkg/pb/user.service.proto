@@ -20,6 +20,12 @@ service UserService {
   rpc UpdateUser(User) returns (User) {}
 
   rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
+
+   rpc UpdateUserIDImage (UpdateIDImageRequest) returns (UpdateIDImageResponse) {}
+
+  rpc UpdateUserIDNumber (UpdateIDNumberRequest) returns (UpdateIDNumberResponse) {}
+
+   rpc UpdateUserSelfie (UpdateSelfieRequest) returns (UpdateSelfieResponse) {}
 }
 
 message ListUsersRequest {
@@ -60,4 +66,38 @@ message DeleteUserRequest {
 
   // The resource name of the User to be deleted.
   string id = 1;
+}
+
+message UpdateIDImageRequest {
+ string UserId = 1; // The ID of the user.
+ string IdImagePath = 2; // The path to the uploaded ID image.
+}
+
+// The response message for updating a user's ID image.
+message UpdateIDImageResponse {
+ bool Success = 1; // Whether the update was successful.
+ User user = 2;
+
+}
+
+message UpdateIDNumberRequest {
+ string UserId = 1; // The ID of the user.
+ string IdNumber = 2; // The new ID number of the user.
+}
+
+// The response message for updating a user's ID number.
+message UpdateIDNumberResponse {
+ bool Success = 1; // Whether the update was successful.
+  User user = 2;
+}
+
+message UpdateSelfieRequest {
+ string UserId = 1; // The ID of the user.
+ string SelfiePath = 2; // The path to the uploaded selfie.
+}
+
+// The response message for updating a user's selfie.
+message UpdateSelfieResponse {
+ bool Success = 1; // Whether the update was successful.
+ User user = 2;
 }
