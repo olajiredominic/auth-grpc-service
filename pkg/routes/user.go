@@ -76,8 +76,20 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 }
 
 func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
-	// TODO: Implement search filters
-	var usersORMList []*models.UserORM
+	// Define a struct to hold the specific columns you want to retrieve
+	type UserColumns struct {
+		Id                 string
+		Email              string
+		Firstname          string
+		Lastname           string
+		Role               string
+		ImageUrl           string
+		Username           string
+		Bio                string
+		VerificationStatus string
+	}
+
+	var usersColumnsList []UserColumns
 	var users []*models.User
 	var totalCount int64
 	var totalPages int64
@@ -103,13 +115,13 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 	}
 
 	if req.Email != nil && *req.Email != "" {
-		query = query.Where("email  LIKE ? ", "%"+*req.Email+"%")
+		query = query.Where("email LIKE ?", "%"+*req.Email+"%")
 	}
+
 	// Query total count of users
 	if err := query.Count(&totalCount).Error; err != nil {
 		log.Println(err)
-		return nil, status.Errorf(codes.Internal,
-			"Could not convert user %s", err)
+		return nil, status.Errorf(codes.Internal, "Could not convert user %s", err)
 	}
 
 	// Calculate total pages
@@ -118,21 +130,28 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 		totalPages++
 	}
 
-	query.Offset(int(offset)).Limit(int(req.Limit)).Find(&usersORMList)
+	// Query users with specific columns
+	query.Offset(int(offset)).Limit(int(req.Limit)).Select("id, email, firstname, lastname, role, image_url, username, bio, verification_status").Find(&usersColumnsList)
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.Internal,
-			"Unable to find users ")
+		return nil, status.Errorf(codes.Internal, "Unable to find users ")
 	}
 
-	for _, obj := range usersORMList {
-		userObj, err := obj.ToPB(ctx)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal,
-				"Could not convert user %s", err)
+	// Convert UserColumnsList to models.User objects
+	for _, userColumns := range usersColumnsList {
+		userData := &models.User{
+			Id:        userColumns.Id,
+			Email:     userColumns.Email,
+			Firstname: userColumns.Firstname,
+			Lastname:  userColumns.Lastname,
+			Role:      userColumns.Role,
+			ImageUrl:  userColumns.ImageUrl,
+			Username:  userColumns.Username,
+			Bio:       userColumns.Bio,
+			// VerificationStatus: models.VerificationStatus(userColumns.VerificationStatus),
 		}
 
-		users = append(users, &userObj)
+		users = append(users, userData)
 	}
 
 	if req.Page < int32(totalPages) {
