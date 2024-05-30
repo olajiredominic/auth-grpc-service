@@ -8,6 +8,7 @@ import (
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
 	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
+
 	"gorm.io/gorm"
 
 	"github.com/google/uuid"
@@ -380,8 +381,26 @@ func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequ
 	return response, nil
 }
 
+// UpdateUserIDNumber updates the user's ID number in the database after verification
 func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumberRequest) (*pb.UpdateIDNumberResponse, error) {
-	// First, check if the user exists in UserORM
+	// First, verify the ID number
+	verifyReq := &pb.VerifyNINRequest{
+		IdNumber:  req.IdNumber,
+		Firstname: req.Firstname,
+		Lastname:  req.Lastname,
+		// Middlename: req.Middlename,
+		// Dob:        req.Dob,
+		// Phone:      req.Phone,
+		// Email:      req.Email,
+		// Gender:     req.Gender,
+	}
+	_, err := h.VerifyNIN(ctx, verifyReq)
+	if err != nil {
+		log.Println("NIN verification failed:", err)
+		return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
+	}
+
+	// If verification is successful, proceed to update the database
 	var user models.UserORM
 	query := h.DB.First(&user, "id = ?", req.UserId)
 	if query.Error != nil {
@@ -400,14 +419,14 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 	}
 
 	// Next, check if the user exists in UserVerificationORM
-	var verification models.UserVerificationORM
-	query = h.DB.First(&verification, "user_id = ?", req.UserId)
+	var verificationORM models.UserVerificationORM
+	query = h.DB.First(&verificationORM, "user_id = ?", req.UserId)
 	if query.Error != nil {
 		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			// User does not exist in UserVerificationORM, create a new row
-			verification.UserId = &req.UserId
-			verification.IdNumber = req.IdNumber
-			if err := h.DB.Create(&verification).Error; err != nil {
+			verificationORM.UserId = &req.UserId
+			verificationORM.IdNumber = req.IdNumber
+			if err := h.DB.Create(&verificationORM).Error; err != nil {
 				log.Println("Error creating user verification ", req.UserId, err)
 				return nil, status.Errorf(codes.Internal, "Database error")
 			}
@@ -417,7 +436,7 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 		}
 	} else {
 		// User exists in UserVerificationORM, update the necessary fields
-		if err := h.DB.Model(&verification).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+		if err := h.DB.Model(&verificationORM).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
 			IdNumber: req.IdNumber,
 		}).Error; err != nil {
 			log.Println("Error updating user verification ", req.UserId, err)

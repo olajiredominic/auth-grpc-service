@@ -13,7 +13,7 @@ option go_package = "pkg/pb";
 service UserService {
   rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) {}
 
-  rpc GetUser(GetUserRequest) returns (User) { }
+ rpc GetUser(GetUserRequest) returns (User) { }
 
   rpc CreateUser(User) returns (User) { }
 
@@ -21,11 +21,12 @@ service UserService {
 
   rpc DeleteUser(DeleteUserRequest) returns (google.protobuf.Empty) {}
 
-   rpc UpdateUserIDImage (UpdateIDImageRequest) returns (UpdateIDImageResponse) {}
+   rpc UpdateUserIDImage(UpdateIDImageRequest) returns (UpdateIDImageResponse) {}
 
-  rpc UpdateUserIDNumber (UpdateIDNumberRequest) returns (UpdateIDNumberResponse) {}
+  rpc UpdateUserIDNumber(UpdateIDNumberRequest) returns (UpdateIDNumberResponse) {}
 
-   rpc UpdateUserSelfie (UpdateSelfieRequest) returns (UpdateSelfieResponse) {}
+   rpc UpdateUserSelfie(UpdateSelfieRequest) returns (UpdateSelfieResponse) {}
+
 }
 
 message ListUsersRequest {
@@ -83,6 +84,8 @@ message UpdateIDImageResponse {
 message UpdateIDNumberRequest {
  string UserId = 1; // The ID of the user.
  string IdNumber = 2; // The new ID number of the user.
+ string Firstname = 3;
+ string Lastname = 4;
 }
 
 // The response message for updating a user's ID number.
