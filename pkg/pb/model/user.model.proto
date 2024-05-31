@@ -75,6 +75,8 @@ message UserVerification {
   string IdFilePath = 4;
   string IdNumber = 5;
   User User = 6 [(gorm.field).belongs_to = {association_foreignkey: "id"}];
+  string FirstName = 7;
+  string LastName = 8;
  }
  
 

@@ -222,20 +222,44 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	// Perform additional verification logic based on IdType
 	switch req.IdType {
 	case models.IdType_DRIVERS_LICENCE:
-		// Perform verification logic for driver's license
-		// ...
+		res, err := h.VerifyDL(ctx, &pb.VerifyDLRequest{
+			IdNumber:  req.IdNumber,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
+			Email:     req.Email,
+			Phone:     req.Telephone,
+			// Gender: existingUser.Gender,
+			// Middleware: existingUser.Middleware,
+			// Dob: existingUser.Dob,
+		})
 
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
+		if err != nil {
+			return nil, err
+		}
 	case models.IdType_PASSPORT:
-		// Perform verification logic for passport
-		// ...
+		res, err := h.VerifyPassport(ctx, &pb.VerifyPassportRequest{
+			IdNumber:  req.IdNumber,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
+			Email:     req.Email,
+			Phone:     req.Telephone,
+			// Gender: existingUser.Gender,
+			// Middleware: existingUser.Middleware,
+			// Dob: existingUser.Dob,
+		})
 
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
+		if err != nil {
+			return nil, err
+		}
 	case models.IdType_IDENTITY_CARD:
 		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
 			IdNumber:  req.IdNumber,
-			Firstname: existingUser.Firstname,
-			Lastname:  existingUser.Lastname,
-			Email:     existingUser.Email,
-			Phone:     existingUser.Telephone,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
+			Email:     req.Email,
+			Phone:     req.Telephone,
 			// Gender: existingUser.Gender,
 			// Middleware: existingUser.Middleware,
 			// Dob: existingUser.Dob,
@@ -396,21 +420,21 @@ func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequ
 // UpdateUserIDNumber updates the user's ID number in the database after verification
 func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumberRequest) (*pb.UpdateIDNumberResponse, error) {
 	// First, verify the ID number
-	verifyReq := &pb.VerifyNINRequest{
-		IdNumber:  req.IdNumber,
-		Firstname: req.Firstname,
-		Lastname:  req.Lastname,
-		// Middlename: req.Middlename,
-		// Dob:        req.Dob,
-		// Phone:      req.Phone,
-		// Email:      req.Email,
-		// Gender:     req.Gender,
-	}
-	_, err := h.VerifyNIN(ctx, verifyReq)
-	if err != nil {
-		log.Println("NIN verification failed:", err)
-		return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
-	}
+	// verifyReq := &pb.VerifyNINRequest{
+	// 	IdNumber:  req.IdNumber,
+	// 	Firstname: req.Firstname,
+	// 	Lastname:  req.Lastname,
+	// 	// Middlename: req.Middlename,
+	// 	// Dob:        req.Dob,
+	// 	// Phone:      req.Phone,
+	// 	// Email:      req.Email,
+	// 	// Gender:     req.Gender,
+	// }
+	// _, err := h.VerifyNIN(ctx, verifyReq)
+	// if err != nil {
+	// 	log.Println("NIN verification failed:", err)
+	// 	return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
+	// }
 
 	// If verification is successful, proceed to update the database
 	var user models.UserORM
