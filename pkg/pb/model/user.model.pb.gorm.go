@@ -349,9 +349,11 @@ type UserWithAfterToPB interface {
 
 type UserVerificationORM struct {
 	CountryCode string
+	FirstName   string
 	IdFilePath  string
 	IdNumber    string
 	IdType      int32
+	LastName    string
 	Selfie      string
 	User        *UserORM `gorm:"foreignkey:UserId;association_foreignkey:Id"`
 	UserId      *string
@@ -384,6 +386,8 @@ func (m *UserVerification) ToORM(ctx context.Context) (UserVerificationORM, erro
 		}
 		to.User = &tempUser
 	}
+	to.FirstName = m.FirstName
+	to.LastName = m.LastName
 	if posthook, ok := interface{}(m).(UserVerificationWithAfterToORM); ok {
 		err = posthook.AfterToORM(ctx, &to)
 	}
@@ -412,6 +416,8 @@ func (m *UserVerificationORM) ToPB(ctx context.Context) (UserVerification, error
 		}
 		to.User = &tempUser
 	}
+	to.FirstName = m.FirstName
+	to.LastName = m.LastName
 	if posthook, ok := interface{}(m).(UserVerificationWithAfterToPB); ok {
 		err = posthook.AfterToPB(ctx, &to)
 	}
@@ -1819,6 +1825,14 @@ func DefaultApplyFieldMaskUserVerification(ctx context.Context, patchee *UserVer
 		if f == prefix+"User" {
 			updatedUser = true
 			patchee.User = patcher.User
+			continue
+		}
+		if f == prefix+"FirstName" {
+			patchee.FirstName = patcher.FirstName
+			continue
+		}
+		if f == prefix+"LastName" {
+			patchee.LastName = patcher.LastName
 			continue
 		}
 	}
