@@ -104,7 +104,7 @@ func (h *Handler) VerifyNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb.
 		"Authorization": fmt.Sprintf("Bearer %s", token.Token),
 	}
 	resp, _ := helpers.PostRequest(url, payload, header)
-	if resp.StatusCode != http.StatusCreated {
+	if resp.StatusCode != http.StatusOK {
 		return nil, status.Errorf(codes.Internal, "Received non-200 response: %v", resp.Status)
 	}
 

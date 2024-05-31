@@ -3,7 +3,9 @@ package routes
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"strconv"
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
@@ -213,7 +215,7 @@ func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*e
 func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) (*emptypb.Empty, error) {
 	// Check if user with the provided ID already exists
 	var existingUser models.UserORM
-	query := h.DB.First(&existingUser, "id = ?", req.User)
+	query := h.DB.First(&existingUser, "id =?", req.User.Id)
 	if query.Error != nil {
 		log.Println("User not found for verification:", query.Error)
 		return nil, status.Errorf(codes.NotFound, "User not found for verification")
@@ -223,59 +225,71 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	switch req.IdType {
 	case models.IdType_DRIVERS_LICENCE:
 		res, err := h.VerifyDL(ctx, &pb.VerifyDLRequest{
-			IdNumber:  req.IdNumber,
-			Firstname: req.Firstname,
-			Lastname:  req.Lastname,
-			Email:     req.Email,
-			Phone:     req.Telephone,
-			// Gender: existingUser.Gender,
-			// Middleware: existingUser.Middleware,
-			// Dob: existingUser.Dob,
+			IdNumber:  string(req.IdNumber),
+			Firstname: req.FirstName,
+			Lastname:  req.LastName,
+			// Other fields...
 		})
 
-		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
 		if err != nil {
 			return nil, err
 		}
+		// Update the id_number of UserVerification instead of UserID
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
+			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			UserId:   existingUser.Id, // Assuming UserORM has an ID field
+		})
+		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
+			IdType: 0,
+			UserId: existingUser.Id,
+		})
 	case models.IdType_PASSPORT:
 		res, err := h.VerifyPassport(ctx, &pb.VerifyPassportRequest{
-			IdNumber:  req.IdNumber,
-			Firstname: req.Firstname,
-			Lastname:  req.Lastname,
-			Email:     req.Email,
-			Phone:     req.Telephone,
-			// Gender: existingUser.Gender,
-			// Middleware: existingUser.Middleware,
-			// Dob: existingUser.Dob,
+			IdNumber:  string(req.IdNumber),
+			Firstname: req.FirstName,
+			Lastname:  req.LastName,
+			// Other fields...
 		})
 
-		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
 		if err != nil {
 			return nil, err
 		}
+		// Update the id_number of UserVerification
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
+			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			UserId:   existingUser.Id, // Assuming UserORM has an ID field
+		})
+		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
+			IdType: 1,
+			UserId: existingUser.Id,
+		})
 	case models.IdType_IDENTITY_CARD:
 		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
-			IdNumber:  req.IdNumber,
-			Firstname: req.Firstname,
-			Lastname:  req.Lastname,
-			Email:     req.Email,
-			Phone:     req.Telephone,
-			// Gender: existingUser.Gender,
-			// Middleware: existingUser.Middleware,
-			// Dob: existingUser.Dob,
+			IdNumber:  string(req.IdNumber),
+			Firstname: req.FirstName,
+			Lastname:  req.LastName,
+			// Other fields...
 		})
 
-		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
 		if err != nil {
 			return nil, err
 		}
+		// Update the id_number of UserVerification
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
+			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			UserId:   existingUser.Id, // Assuming UserORM has an ID field
+		})
+		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
+			IdType: 2,
+			UserId: existingUser.Id,
+		})
 	default:
 		// Invalid IdType
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid IdType")
 	}
 
 	// Perform additional verification logic based on CountryCode
-	// ...
+	//...
 
 	// Update user verification status in the database
 	// For example, you might set a field like IsVerified to true in the UserORM model
@@ -419,23 +433,6 @@ func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequ
 
 // UpdateUserIDNumber updates the user's ID number in the database after verification
 func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumberRequest) (*pb.UpdateIDNumberResponse, error) {
-	// First, verify the ID number
-	// verifyReq := &pb.VerifyNINRequest{
-	// 	IdNumber:  req.IdNumber,
-	// 	Firstname: req.Firstname,
-	// 	Lastname:  req.Lastname,
-	// 	// Middlename: req.Middlename,
-	// 	// Dob:        req.Dob,
-	// 	// Phone:      req.Phone,
-	// 	// Email:      req.Email,
-	// 	// Gender:     req.Gender,
-	// }
-	// _, err := h.VerifyNIN(ctx, verifyReq)
-	// if err != nil {
-	// 	log.Println("NIN verification failed:", err)
-	// 	return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
-	// }
-
 	// If verification is successful, proceed to update the database
 	var user models.UserORM
 	query := h.DB.First(&user, "id = ?", req.UserId)
@@ -461,7 +458,7 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			// User does not exist in UserVerificationORM, create a new row
 			verificationORM.UserId = &req.UserId
-			verificationORM.IdNumber = req.IdNumber
+			verificationORM.IdNumber = string(req.IdNumber)
 			if err := h.DB.Create(&verificationORM).Error; err != nil {
 				log.Println("Error creating user verification ", req.UserId, err)
 				return nil, status.Errorf(codes.Internal, "Database error")
@@ -473,7 +470,8 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 	} else {
 		// User exists in UserVerificationORM, update the necessary fields
 		if err := h.DB.Model(&verificationORM).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
-			IdNumber: req.IdNumber,
+			//IdNumber: strconv.Itoa(int(req.IdNumber)),
+			IdNumber: fmt.Sprintf("QOREID-%s", strconv.Itoa(int(req.IdNumber))),
 		}).Error; err != nil {
 			log.Println("Error updating user verification ", req.UserId, err)
 			return nil, status.Errorf(codes.Internal, "Database error")
@@ -490,6 +488,62 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 	// Create a response object and populate it with the necessary data
 	response := &pb.UpdateIDNumberResponse{
 		User: &updatedUser, // Assuming pb.UpdateIDNumberResponse has a User field
+	}
+
+	return response, nil
+}
+
+func (h *Handler) UpdateUserIDType(ctx context.Context, req *pb.UpdateIDTypeRequest) (*pb.UpdateIDTypeResponse, error) {
+	// Fetch the user from the UserORM table
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserORM, return an error
+			log.Println("User not found ", req.UserId)
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		} else {
+			log.Println("Error fetching user ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Fetch the user's verification information from UserVerificationORM
+	var verificationORM models.UserVerificationORM
+	query = h.DB.First(&verificationORM, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserVerificationORM, create a new row
+			// verificationORM.UserId = &req.UserId
+			// verificationORM.IdType = int32(req.IdType)
+			if err := h.DB.Create(&verificationORM).Error; err != nil {
+				log.Println("Error creating user verification ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user verification ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists in UserVerificationORM, update the necessary fields
+		if err := h.DB.Model(&verificationORM).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+			IdType: int32(req.IdType),
+		}).Error; err != nil {
+			log.Println("Error updating user verification ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	}
+
+	// Convert the updated UserORM model back to a Pb model
+	updatedUser, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserORM to User model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user ID type")
+	}
+
+	// Create a response object and populate it with the necessary data
+	response := &pb.UpdateIDTypeResponse{
+		User: &updatedUser, // Assuming pb.UpdateIDTypeResponse has a User field
 	}
 
 	return response, nil
