@@ -1,12 +1,12 @@
 package routes
 
 import (
-	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
 
 	"google.golang.org/grpc/codes"
@@ -51,8 +51,29 @@ type NIMCResponse struct {
 	} `json:"nin"`
 }
 
-// VerifyNIN verifies the NIN with the provided details
+func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
+	payload := map[string]string{
+		"clientId": h.ClientID,
+		"secret":   h.SecretKey,
+	}
 
+	resp, _ := helpers.PostRequest(h.TokenURL, payload, nil)
+	if resp.StatusCode != http.StatusCreated {
+		return nil, status.Errorf(codes.Internal, "Received non-200 response: %v", resp.Status)
+	}
+
+	var authResp AuthResponse
+	if err := json.NewDecoder(resp.Body).Decode(&authResp); err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	return &pb.LoginResponse{Token: authResp.AccessToken}, nil
+
+}
+
+// VerifyNIN verifies the NIN with the provided details
 func (h *Handler) VerifyNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb.VerifyNINResponse, error) {
 	// Call the Login function to get the bearer token
 	token, err := h.Login(ctx, &pb.LoginRequest{
@@ -70,7 +91,7 @@ func (h *Handler) VerifyNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb.
 	// Construct the URL using the values from config
 	url := fmt.Sprintf("%s%s/%s", baseURL, ninURL, req.IdNumber)
 
-	payload := map[string]interface{}{
+	payload := map[string]string{
 		"firstname": req.Firstname,
 		"lastname":  req.Lastname,
 		// "middlename": req.Middlename,
@@ -79,68 +100,28 @@ func (h *Handler) VerifyNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb.
 		// "email":      req.Email,
 		// "gender":     req.Gender,
 	}
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to marshal request payload: %v", err)
+	header := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", token.Token),
+	}
+	resp, _ := helpers.PostRequest(url, payload, header)
+	if resp.StatusCode != http.StatusCreated {
+		return nil, status.Errorf(codes.Internal, "Received non-200 response: %v", resp.Status)
 	}
 
-	httpReq, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to create HTTP request: %v", err)
-	}
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token.Token))
-
-	client := &http.Client{}
-	httpResp, err := client.Do(httpReq)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to make HTTP request: %v", err)
-	}
-	defer httpResp.Body.Close()
-
-	var nimcResp NIMCResponse
-	if err := json.NewDecoder(httpResp.Body).Decode(&nimcResp); err != nil {
+	var nimcResp pb.VerifyNINResponse
+	if err := json.NewDecoder(resp.Body).Decode(&nimcResp); err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
 	}
+
+	defer resp.Body.Close()
 
 	if nimcResp.Status.Status != "verified" {
 		return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
 	}
 
-	grpcResp := &pb.VerifyNINResponse{
-		Id: nimcResp.ID,
-		Applicant: &pb.VerifyNINResponse_Applicant{
-			Firstname: nimcResp.Applicant.Firstname,
-			Lastname:  nimcResp.Applicant.Lastname,
-		},
-		Summary: &pb.VerifyNINResponse_Summary{
-			NinCheck: &pb.VerifyNINResponse_Summary_NinCheck{
-				Status: nimcResp.Summary.NINCheck.Status,
-				FieldMatches: &pb.VerifyNINResponse_Summary_NinCheck_FieldMatches{
-					Firstname: nimcResp.Summary.NINCheck.FieldMatches.Firstname,
-					Lastname:  nimcResp.Summary.NINCheck.FieldMatches.Lastname,
-				},
-			},
-		},
-		Status: &pb.VerifyNINResponse_Status{
-			State:  nimcResp.Status.State,
-			Status: nimcResp.Status.Status,
-		},
-		Nin: &pb.VerifyNINResponse_Nin{
-			Nin:        nimcResp.NIN.NIN,
-			Firstname:  nimcResp.NIN.Firstname,
-			Lastname:   nimcResp.NIN.Lastname,
-			Middlename: nimcResp.NIN.Middlename,
-			Phone:      nimcResp.NIN.Phone,
-			Gender:     nimcResp.NIN.Gender,
-			Birthdate:  nimcResp.NIN.Birthdate,
-			Photo:      nimcResp.NIN.Photo,
-			Address:    nimcResp.NIN.Address,
-		},
-	}
-
-	return grpcResp, nil
+	return &nimcResp, nil
 }
+
 func (h *Handler) VerifyVNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb.VerifyNINResponse, error) {
 	// Call the Login function to get the bearer token
 	token, err := h.Login(ctx, &pb.LoginRequest{
@@ -158,110 +139,38 @@ func (h *Handler) VerifyVNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb
 	// Construct the URL using the values from config
 	url := fmt.Sprintf("%s%s/%s", baseURL, VninURL, req.IdNumber)
 
-	payload := map[string]interface{}{
+	payload := map[string]string{
 		"firstname": req.Firstname,
 		"lastname":  req.Lastname,
 		// "middlename": req.Middlename,
 		// "dob":        req.Dob,
-		// "phone":      req.Phone,
+		"phone": req.Phone,
 		// "email":      req.Email,
 		// "gender":     req.Gender,
 	}
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to marshal request payload: %v", err)
+	header := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", token.Token),
 	}
 
-	httpReq, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonPayload))
+	resp, err := helpers.PostRequest(url, payload, header)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to create HTTP request: %v", err)
-	}
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token.Token))
-
-	client := &http.Client{}
-	httpResp, err := client.Do(httpReq)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to make HTTP request: %v", err)
-	}
-	defer httpResp.Body.Close()
-
-	var nimcResp NIMCResponse
-	if err := json.NewDecoder(httpResp.Body).Decode(&nimcResp); err != nil {
 		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
 	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, status.Errorf(codes.FailedPrecondition, "Received non-200 response: %v", resp.Status)
+	}
+
+	var nimcResp pb.VerifyNINResponse
+	if err := json.NewDecoder(resp.Body).Decode(&nimcResp); err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
+	}
+
+	defer resp.Body.Close()
 
 	if nimcResp.Status.Status != "verified" {
 		return nil, status.Errorf(codes.InvalidArgument, "NIN verification failed")
 	}
 
-	grpcResp := &pb.VerifyNINResponse{
-		Id: nimcResp.ID,
-		Applicant: &pb.VerifyNINResponse_Applicant{
-			Firstname: nimcResp.Applicant.Firstname,
-			Lastname:  nimcResp.Applicant.Lastname,
-		},
-		Summary: &pb.VerifyNINResponse_Summary{
-			NinCheck: &pb.VerifyNINResponse_Summary_NinCheck{
-				Status: nimcResp.Summary.NINCheck.Status,
-				FieldMatches: &pb.VerifyNINResponse_Summary_NinCheck_FieldMatches{
-					Firstname: nimcResp.Summary.NINCheck.FieldMatches.Firstname,
-					Lastname:  nimcResp.Summary.NINCheck.FieldMatches.Lastname,
-				},
-			},
-		},
-		Status: &pb.VerifyNINResponse_Status{
-			State:  nimcResp.Status.State,
-			Status: nimcResp.Status.Status,
-		},
-		Nin: &pb.VerifyNINResponse_Nin{
-			Nin:        nimcResp.NIN.NIN,
-			Firstname:  nimcResp.NIN.Firstname,
-			Lastname:   nimcResp.NIN.Lastname,
-			Middlename: nimcResp.NIN.Middlename,
-			Phone:      nimcResp.NIN.Phone,
-			Gender:     nimcResp.NIN.Gender,
-			Birthdate:  nimcResp.NIN.Birthdate,
-			Photo:      nimcResp.NIN.Photo,
-			Address:    nimcResp.NIN.Address,
-		},
-	}
-
-	return grpcResp, nil
-}
-
-func (h *Handler) Login(ctx context.Context, req *pb.LoginRequest) (*pb.LoginResponse, error) {
-	payload := map[string]string{
-		"clientId": h.ClientID,
-		"secret":   h.SecretKey,
-	}
-	jsonPayload, err := json.Marshal(payload)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to marshal request payload: %v", err)
-	}
-
-	httpReq, err := http.NewRequest("POST", h.TokenURL, bytes.NewBuffer(jsonPayload))
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to create HTTP request: %v", err)
-	}
-	httpReq.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(httpReq)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to make HTTP request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusCreated {
-		return nil, status.Errorf(codes.Internal, "Received non-200 response: %v", resp.Status)
-	}
-
-	var authResp AuthResponse
-	if err := json.NewDecoder(resp.Body).Decode(&authResp); err != nil {
-		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
-	}
-
-	return &pb.LoginResponse{Token: authResp.AccessToken}, nil
-
+	return &nimcResp, nil
 }
