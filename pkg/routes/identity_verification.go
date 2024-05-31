@@ -174,3 +174,56 @@ func (h *Handler) VerifyVNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb
 
 	return &nimcResp, nil
 }
+
+func (h *Handler) VerifyDL(ctx context.Context, req *pb.VerifyDLRequest) (*pb.VerifyDLResponse, error) {
+	// Call the Login function to get the bearer token
+	token, err := h.Login(ctx, &pb.LoginRequest{
+		ClientId:  h.ClientID,
+		SecretKey: h.SecretKey,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Unauthenticated, "Failed to login: %v", err)
+	}
+
+	// Fetch the baseURL and dlURL from the config
+	baseURL := h.QoreidBaseURL
+	dlURL := h.DLURL
+
+	// Construct the URL using the values from config
+	url := fmt.Sprintf("%s%s/%s", baseURL, dlURL, req.IdNumber)
+
+	payload := map[string]string{
+		"firstname": req.Firstname,
+		"lastname":  req.Lastname,
+		// "middlename": req.Middlename,
+		// "dob":        req.Dob,
+		"phone": req.Phone,
+		// "email":      req.Email,
+		// "gender":     req.Gender,
+	}
+	header := map[string]string{
+		"Authorization": fmt.Sprintf("Bearer %s", token.Token),
+	}
+
+	resp, err := helpers.PostRequest(url, payload, header)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to send request: %v", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, status.Errorf(codes.FailedPrecondition, "Received non-200 response: %v", resp.Status)
+	}
+
+	var dlResp pb.VerifyDLResponse
+	if err := json.NewDecoder(resp.Body).Decode(&dlResp); err != nil {
+		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
+	}
+
+	defer resp.Body.Close()
+
+	if dlResp.Status.Status != "verified" {
+		return nil, status.Errorf(codes.InvalidArgument, "Driver's License verification failed")
+	}
+
+	return &dlResp, nil
+}

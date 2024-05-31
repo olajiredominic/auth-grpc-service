@@ -18,6 +18,7 @@ type Config struct {
 	QOREID_BASE_URL string `mapstructure:"QOREID_BASE_URL"`
 	VNIN_URL        string `mapstructure:"VNIN_URL"`
 	NIN_URL         string `mapstructure:"NIN_URL"`
+	DL_URL          string `mapstructure:"DL_URL"`
 }
 
 func LoadConfig() (config Config, err error) {

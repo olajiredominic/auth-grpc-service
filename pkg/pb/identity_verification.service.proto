@@ -1,7 +1,4 @@
 syntax = "proto3";
-//import "google/protobuf/timestamp.proto";
-// import "google/protobuf/field_behavior.proto";
-//import "pkg/pb/model/user.model.proto";
 
 import "google/protobuf/descriptor.proto";
 
@@ -14,12 +11,11 @@ package identity_verification;
 option go_package = "pkg/pb";
 
 service VerificationService {
-
-rpc VerifyNIN(VerifyNINRequest) returns (VerifyNINResponse);
-rpc VerifyVNIN(VerifyNINRequest) returns (VerifyNINResponse);
-rpc Login(LoginRequest) returns (LoginResponse);
+    rpc VerifyNIN(VerifyNINRequest) returns (VerifyNINResponse);
+    rpc VerifyVNIN(VerifyNINRequest) returns (VerifyNINResponse);
+    rpc VerifyDL(VerifyDLRequest) returns (VerifyDLResponse);
+    rpc Login(LoginRequest) returns (LoginResponse);
 }
-
 
 // VerifyNINRequest is the request message for verifying NIN
 message VerifyNINRequest {
@@ -33,26 +29,27 @@ message VerifyNINRequest {
     string gender = 8;
 }
 
-message Applicant {
+// Reused message types with unique names
+message ApplicantNIN {
     string Firstname = 1 [ (json_name) = "firstname"];
     string Lastname = 2 [ (json_name) = "lastname"];
 }
 
-message FieldMatches {
+message FieldMatchesNIN {
     bool Firstname = 1 [ (json_name) = "firstname"];
     bool Lastname = 2 [ (json_name) = "lastname"];
 }
 
 message NinCheck {
-    string status = 1 [ (json_name) = "status"];
-    FieldMatches FieldMatches = 2 [ (json_name) = "fieldMatches"];
+    string Status = 1 [ (json_name) = "status"];
+    FieldMatchesNIN FieldMatches = 2 [ (json_name) = "fieldMatches"];
 }
 
-message Summary {
+message SummaryNIN {
     NinCheck NinCheck = 1 [ (json_name) = "nin_check"];
 }
 
-message Status {
+message StatusNIN {
     string State = 1  [ (json_name) = "state"];
     string Status = 2  [ (json_name) = "status"];
 }
@@ -68,13 +65,13 @@ message Nin {
     string Photo = 8 [ (json_name) = "photo"];
     string Address = 9 [ (json_name) = "address"];
 }
+
 // VerifyNINResponse is the response message for verifying NIN
 message VerifyNINResponse {
-
-    int32 Id = 1  [ (json_name) = "id"];
-    Applicant Applicant = 2 [ (json_name) = "applicant"];
-    Summary Summary = 3 [ (json_name) = "summary"];
-    Status Status = 4 [ (json_name) = "status"];
+    int32 Id = 1 [ (json_name) = "id"];
+    ApplicantNIN Applicant = 2 [ (json_name) = "applicant"];
+    SummaryNIN Summary = 3 [ (json_name) = "summary"];
+    StatusNIN Status = 4 [ (json_name) = "status"];
     Nin Nin = 5 [ (json_name) = "nin"];
 }
 
@@ -85,4 +82,63 @@ message LoginRequest {
 
 message LoginResponse {
     string token = 1;
+}
+
+// VerifyDLRequest is the request message for verifying driver's license
+message VerifyDLRequest {
+    string idNumber = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string middlename = 4;
+    string dob = 5;
+    string phone = 6;
+    string email = 7;
+    string gender = 8;
+}
+
+// Reused message types with unique names
+message ApplicantDL {
+    string Firstname = 1 [ (json_name) = "firstname"];
+    string Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message FieldMatchesDL {
+    bool Firstname = 1 [ (json_name) = "firstname"];
+    bool Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message DriversLicenseCheck {
+    string Status = 1 [ (json_name) = "status"];
+    FieldMatchesDL FieldMatches = 2 [ (json_name) = "fieldMatches"];
+}
+
+message SummaryDL {
+    DriversLicenseCheck DriversLicenseCheck = 1 [ (json_name) = "drivers_license_check"];
+}
+
+message StatusDL {
+    string State = 1 [ (json_name) = "state"];
+    string Status = 2 [ (json_name) = "status"];
+}
+
+message DriversLicense {
+    string DriversLicense = 1 [ (json_name) = "drivers_license"];
+    string Firstname = 2 [ (json_name) = "firstname"];
+    string Lastname = 3 [ (json_name) = "lastname"];
+    string Middlename = 4 [ (json_name) = "middlename"];
+    string Birthdate = 5 [ (json_name) = "birthdate"];
+    string Photo = 6 [ (json_name) = "photo"];
+    string IssuedDate = 7 [ (json_name) = "issued_date"];
+    string ExpiryDate = 8 [ (json_name) = "expiry_date"];
+    string StateOfIssue = 9 [ (json_name) = "state_of_issue"];
+    string Address = 10 [ (json_name) = "address"];
+}
+
+// VerifyDLResponse is the response message for verifying driver's license
+message VerifyDLResponse {
+    int32 Id = 1 [ (json_name) = "id"];
+    ApplicantDL Applicant = 2 [ (json_name) = "applicant"];
+    SummaryDL Summary = 3 [ (json_name) = "summary"];
+    StatusDL Status = 4 [ (json_name) = "status"];
+    DriversLicense DriversLicense = 5 [ (json_name) = "drivers_license"];
 }
