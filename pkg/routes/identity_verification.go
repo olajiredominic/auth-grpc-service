@@ -157,8 +157,8 @@ func (h *Handler) VerifyVNIN(ctx context.Context, req *pb.VerifyNINRequest) (*pb
 		return nil, status.Errorf(codes.Internal, "Failed to decode response: %v", err)
 	}
 
-	if resp.StatusCode != http.StatusCreated {
-		return nil, status.Errorf(codes.Internal, "Received non-200 response: %v", resp.Status)
+	if resp.StatusCode != http.StatusOK {
+		return nil, status.Errorf(codes.FailedPrecondition, "Received non-200 response: %v", resp.Status)
 	}
 
 	var nimcResp pb.VerifyNINResponse

@@ -230,7 +230,7 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 		// ...
 
 	case models.IdType_IDENTITY_CARD:
-		h.VerifyNIN(ctx, &pb.VerifyNINRequest{
+		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
 			IdNumber:  req.IdNumber,
 			Firstname: existingUser.Firstname,
 			Lastname:  existingUser.Lastname,
@@ -241,6 +241,10 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 			// Dob: existingUser.Dob,
 		})
 
+		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{IdNumber: string(res.Id), UserId: existingUser.Id})
+		if err != nil {
+			return nil, err
+		}
 	default:
 		// Invalid IdType
 		return nil, status.Errorf(codes.InvalidArgument, "Invalid IdType")
