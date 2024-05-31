@@ -14,6 +14,7 @@ service VerificationService {
     rpc VerifyNIN(VerifyNINRequest) returns (VerifyNINResponse);
     rpc VerifyVNIN(VerifyNINRequest) returns (VerifyNINResponse);
     rpc VerifyDL(VerifyDLRequest) returns (VerifyDLResponse);
+    rpc VerifyPassport(VerifyPassportRequest) returns (VerifyPassportResponse);
     rpc Login(LoginRequest) returns (LoginResponse);
 }
 
@@ -84,7 +85,6 @@ message LoginResponse {
     string token = 1;
 }
 
-// VerifyDLRequest is the request message for verifying driver's license
 message VerifyDLRequest {
     string idNumber = 1;
     string firstname = 2;
@@ -96,7 +96,6 @@ message VerifyDLRequest {
     string gender = 8;
 }
 
-// Reused message types with unique names
 message ApplicantDL {
     string Firstname = 1 [ (json_name) = "firstname"];
     string Lastname = 2 [ (json_name) = "lastname"];
@@ -131,14 +130,68 @@ message DriversLicense {
     string IssuedDate = 7 [ (json_name) = "issued_date"];
     string ExpiryDate = 8 [ (json_name) = "expiry_date"];
     string StateOfIssue = 9 [ (json_name) = "state_of_issue"];
-    string Address = 10 [ (json_name) = "address"];
 }
 
-// VerifyDLResponse is the response message for verifying driver's license
 message VerifyDLResponse {
     int32 Id = 1 [ (json_name) = "id"];
     ApplicantDL Applicant = 2 [ (json_name) = "applicant"];
     SummaryDL Summary = 3 [ (json_name) = "summary"];
     StatusDL Status = 4 [ (json_name) = "status"];
     DriversLicense DriversLicense = 5 [ (json_name) = "drivers_license"];
+}
+
+message VerifyPassportRequest {
+    string idNumber = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string middlename = 4;
+    string dob = 5;
+    string phone = 6;
+    string email = 7;
+    string gender = 8;
+}
+
+message ApplicantPassport {
+    string Firstname = 1 [ (json_name) = "firstname"];
+    string Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message FieldMatchesPassport {
+    bool Firstname = 1 [ (json_name) = "firstname"];
+    bool Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message PassportCheck {
+    string Status = 1 [ (json_name) = "status"];
+    FieldMatchesPassport FieldMatches = 2 [ (json_name) = "fieldMatches"];
+}
+
+message SummaryPassport {
+    PassportCheck PassportCheck = 1 [ (json_name) = "passport_check"];
+}
+
+message StatusPassport {
+    string State = 1 [ (json_name) = "state"];
+    string Status = 2 [ (json_name) = "status"];
+}
+
+message Passport {
+    string PassportNo = 1 [ (json_name) = "passport_no"];
+    string Firstname = 2 [ (json_name) = "firstname"];
+    string Lastname = 3 [ (json_name) = "lastname"];
+    string Middlename = 4 [ (json_name) = "middlename"];
+    string Birthdate = 5 [ (json_name) = "birthdate"];
+    string Photo = 6 [ (json_name) = "photo"];
+    string Gender = 7 [ (json_name) = "gender"];
+    string IssuedAt = 8 [ (json_name) = "issued_at"];
+    string IssuedDate = 9 [ (json_name) = "issued_date"];
+    string ExpiryDate = 10 [ (json_name) = "expiry_date"];
+}
+
+message VerifyPassportResponse {
+    int32 Id = 1 [ (json_name) = "id"];
+    ApplicantPassport Applicant = 2 [ (json_name) = "applicant"];
+    SummaryPassport Summary = 3 [ (json_name) = "summary"];
+    StatusPassport Status = 4 [ (json_name) = "status"];
+    Passport Passport = 5 [ (json_name) = "passport"];
 }

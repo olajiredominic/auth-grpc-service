@@ -25,6 +25,7 @@ type VerificationServiceClient interface {
 	VerifyNIN(ctx context.Context, in *VerifyNINRequest, opts ...grpc.CallOption) (*VerifyNINResponse, error)
 	VerifyVNIN(ctx context.Context, in *VerifyNINRequest, opts ...grpc.CallOption) (*VerifyNINResponse, error)
 	VerifyDL(ctx context.Context, in *VerifyDLRequest, opts ...grpc.CallOption) (*VerifyDLResponse, error)
+	VerifyPassport(ctx context.Context, in *VerifyPassportRequest, opts ...grpc.CallOption) (*VerifyPassportResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 }
 
@@ -63,6 +64,15 @@ func (c *verificationServiceClient) VerifyDL(ctx context.Context, in *VerifyDLRe
 	return out, nil
 }
 
+func (c *verificationServiceClient) VerifyPassport(ctx context.Context, in *VerifyPassportRequest, opts ...grpc.CallOption) (*VerifyPassportResponse, error) {
+	out := new(VerifyPassportResponse)
+	err := c.cc.Invoke(ctx, "/identity_verification.VerificationService/VerifyPassport", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *verificationServiceClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, "/identity_verification.VerificationService/Login", in, out, opts...)
@@ -79,6 +89,7 @@ type VerificationServiceServer interface {
 	VerifyNIN(context.Context, *VerifyNINRequest) (*VerifyNINResponse, error)
 	VerifyVNIN(context.Context, *VerifyNINRequest) (*VerifyNINResponse, error)
 	VerifyDL(context.Context, *VerifyDLRequest) (*VerifyDLResponse, error)
+	VerifyPassport(context.Context, *VerifyPassportRequest) (*VerifyPassportResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
 }
 
@@ -94,6 +105,9 @@ func (UnimplementedVerificationServiceServer) VerifyVNIN(context.Context, *Verif
 }
 func (UnimplementedVerificationServiceServer) VerifyDL(context.Context, *VerifyDLRequest) (*VerifyDLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyDL not implemented")
+}
+func (UnimplementedVerificationServiceServer) VerifyPassport(context.Context, *VerifyPassportRequest) (*VerifyPassportResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyPassport not implemented")
 }
 func (UnimplementedVerificationServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
@@ -164,6 +178,24 @@ func _VerificationService_VerifyDL_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VerificationService_VerifyPassport_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyPassportRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VerificationServiceServer).VerifyPassport(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/identity_verification.VerificationService/VerifyPassport",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VerificationServiceServer).VerifyPassport(ctx, req.(*VerifyPassportRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _VerificationService_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(LoginRequest)
 	if err := dec(in); err != nil {
@@ -200,6 +232,10 @@ var VerificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "VerifyDL",
 			Handler:    _VerificationService_VerifyDL_Handler,
+		},
+		{
+			MethodName: "VerifyPassport",
+			Handler:    _VerificationService_VerifyPassport_Handler,
 		},
 		{
 			MethodName: "Login",

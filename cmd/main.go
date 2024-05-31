@@ -26,7 +26,7 @@ func main() {
 
 	dbUrl := fmt.Sprintf("postgres://%s:%s@%s", config.DBUSER, config.DBPWD, config.DBURL)
 	log.Println("Database Url", dbUrl)
-	handler := routes.Init(dbUrl, config.CLIENT_ID, config.SECRET_KEY, config.TOKEN_URL, config.QOREID_BASE_URL, config.VNIN_URL, config.NIN_URL, config.DL_URL)
+	handler := routes.Init(dbUrl, config.CLIENT_ID, config.SECRET_KEY, config.TOKEN_URL, config.QOREID_BASE_URL, config.VNIN_URL, config.NIN_URL, config.DL_URL, config.PASSPORT_URL)
 	h := routes.Handler{
 		DB:            handler.DB,
 		ClientID:      config.CLIENT_ID,
@@ -36,6 +36,7 @@ func main() {
 		VNINURL:       config.VNIN_URL,
 		NINURL:        config.NIN_URL,
 		DLURL:         config.DL_URL,
+		PassportURL:   config.PASSPORT_URL,
 	}
 
 	grpcServer := grpc.NewServer()

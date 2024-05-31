@@ -18,10 +18,11 @@ type Handler struct {
 	VNINURL       string
 	NINURL        string
 	DLURL         string
+	PassportURL   string
 }
 
 // New creates a new Handler with the provided database connection
-func New(db *gorm.DB, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dlURL string) Handler {
+func New(db *gorm.DB, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dlURL, passportURL string) Handler {
 	return Handler{
 		DB:            db,
 		ClientID:      clientID,
@@ -31,11 +32,12 @@ func New(db *gorm.DB, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, nin
 		VNINURL:       vninURL,
 		NINURL:        ninURL,
 		DLURL:         dlURL,
+		PassportURL:   passportURL,
 	}
 }
 
 // Init initializes the database connection and returns a Handler
-func Init(url, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dlURL string) Handler {
+func Init(url, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dlURL, passportURL string) Handler {
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{})
 	if err != nil {
 		log.Fatalln(err)
@@ -52,5 +54,6 @@ func Init(url, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dl
 		VNINURL:       vninURL,
 		NINURL:        ninURL,
 		DLURL:         dlURL,
+		PassportURL:   passportURL,
 	}
 }
