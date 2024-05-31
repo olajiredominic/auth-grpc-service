@@ -1,8 +1,13 @@
 syntax = "proto3";
 //import "google/protobuf/timestamp.proto";
-//import "google/protobuf/empty.proto";
+// import "google/protobuf/field_behavior.proto";
 //import "pkg/pb/model/user.model.proto";
 
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+  string json_name = 50001;
+}
 
 package identity_verification;
 
@@ -28,49 +33,49 @@ message VerifyNINRequest {
     string gender = 8;
 }
 
+message Applicant {
+    string Firstname = 1 [ (json_name) = "firstname"];
+    string Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message FieldMatches {
+    bool Firstname = 1 [ (json_name) = "firstname"];
+    bool Lastname = 2 [ (json_name) = "lastname"];
+}
+
+message NinCheck {
+    string status = 1 [ (json_name) = "status"];
+    FieldMatches FieldMatches = 2 [ (json_name) = "fieldMatches"];
+}
+
+message Summary {
+    NinCheck NinCheck = 1 [ (json_name) = "nin_check"];
+}
+
+message Status {
+    string State = 1  [ (json_name) = "state"];
+    string Status = 2  [ (json_name) = "status"];
+}
+
+message Nin {
+    string Nin = 1 [ (json_name) = "nin"];
+    string Firstname = 2 [ (json_name) = "firstname"];
+    string Lastname = 3 [ (json_name) = "lastname"];
+    string Middlename = 4 [ (json_name) = "middlename"];
+    string Phone = 5 [ (json_name) = "phone"];
+    string Gender = 6 [ (json_name) = "gender"];
+    string Birthdate = 7 [ (json_name) = "birthdate"];
+    string Photo = 8 [ (json_name) = "photo"];
+    string Address = 9 [ (json_name) = "address"];
+}
 // VerifyNINResponse is the response message for verifying NIN
 message VerifyNINResponse {
-    int32 id = 1;
-    Applicant applicant = 2;
-    Summary summary = 3;
-    Status status = 4;
-    Nin nin = 5;
 
-    message Applicant {
-        string firstname = 1;
-        string lastname = 2;
-    }
-
-    message Summary {
-        NinCheck nin_check = 1;
-
-        message NinCheck {
-            string status = 1;
-            FieldMatches fieldMatches = 2;
-
-            message FieldMatches {
-                bool firstname = 1;
-                bool lastname = 2;
-            }
-        }
-    }
-
-    message Status {
-        string state = 1;
-        string status = 2;
-    }
-
-    message Nin {
-        string nin = 1;
-        string firstname = 2;
-        string lastname = 3;
-        string middlename = 4;
-        string phone = 5;
-        string gender = 6;
-        string birthdate = 7;
-        string photo = 8;
-        string address = 9;
-    }
+    int32 Id = 1  [ (json_name) = "id"];
+    Applicant Applicant = 2 [ (json_name) = "applicant"];
+    Summary Summary = 3 [ (json_name) = "summary"];
+    Status Status = 4 [ (json_name) = "status"];
+    Nin Nin = 5 [ (json_name) = "nin"];
 }
 
 message LoginRequest {

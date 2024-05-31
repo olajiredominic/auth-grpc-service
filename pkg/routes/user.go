@@ -230,8 +230,16 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 		// ...
 
 	case models.IdType_IDENTITY_CARD:
-		// Perform verification logic for identity card
-		// ...
+		h.VerifyNIN(ctx, &pb.VerifyNINRequest{
+			IdNumber:  req.IdNumber,
+			Firstname: existingUser.Firstname,
+			Lastname:  existingUser.Lastname,
+			Email:     existingUser.Email,
+			Phone:     existingUser.Telephone,
+			// Gender: existingUser.Gender,
+			// Middleware: existingUser.Middleware,
+			// Dob: existingUser.Dob,
+		})
 
 	default:
 		// Invalid IdType
