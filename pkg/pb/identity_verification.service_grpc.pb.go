@@ -27,7 +27,7 @@ type VerificationServiceClient interface {
 	VerifyDL(ctx context.Context, in *VerifyDLRequest, opts ...grpc.CallOption) (*VerifyDLResponse, error)
 	VerifyPassport(ctx context.Context, in *VerifyPassportRequest, opts ...grpc.CallOption) (*VerifyPassportResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	VerifyNINImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error)
+	VerifyIDImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error)
 }
 
 type verificationServiceClient struct {
@@ -83,9 +83,9 @@ func (c *verificationServiceClient) Login(ctx context.Context, in *LoginRequest,
 	return out, nil
 }
 
-func (c *verificationServiceClient) VerifyNINImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error) {
+func (c *verificationServiceClient) VerifyIDImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error) {
 	out := new(VerifyIdentityImageResponse)
-	err := c.cc.Invoke(ctx, "/identity_verification.VerificationService/VerifyNINImage", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/identity_verification.VerificationService/VerifyIDImage", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +101,7 @@ type VerificationServiceServer interface {
 	VerifyDL(context.Context, *VerifyDLRequest) (*VerifyDLResponse, error)
 	VerifyPassport(context.Context, *VerifyPassportRequest) (*VerifyPassportResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	VerifyNINImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error)
+	VerifyIDImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error)
 }
 
 // UnimplementedVerificationServiceServer should be embedded to have forward compatible implementations.
@@ -123,8 +123,8 @@ func (UnimplementedVerificationServiceServer) VerifyPassport(context.Context, *V
 func (UnimplementedVerificationServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedVerificationServiceServer) VerifyNINImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method VerifyNINImage not implemented")
+func (UnimplementedVerificationServiceServer) VerifyIDImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyIDImage not implemented")
 }
 
 // UnsafeVerificationServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -228,20 +228,20 @@ func _VerificationService_Login_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _VerificationService_VerifyNINImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _VerificationService_VerifyIDImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(VerifyIdentityImageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(VerificationServiceServer).VerifyNINImage(ctx, in)
+		return srv.(VerificationServiceServer).VerifyIDImage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/identity_verification.VerificationService/VerifyNINImage",
+		FullMethod: "/identity_verification.VerificationService/VerifyIDImage",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(VerificationServiceServer).VerifyNINImage(ctx, req.(*VerifyIdentityImageRequest))
+		return srv.(VerificationServiceServer).VerifyIDImage(ctx, req.(*VerifyIdentityImageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -274,8 +274,8 @@ var VerificationService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _VerificationService_Login_Handler,
 		},
 		{
-			MethodName: "VerifyNINImage",
-			Handler:    _VerificationService_VerifyNINImage_Handler,
+			MethodName: "VerifyIDImage",
+			Handler:    _VerificationService_VerifyIDImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -26,7 +26,7 @@ service VerificationService {
     rpc VerifyDL(VerifyDLRequest) returns (VerifyDLResponse);
     rpc VerifyPassport(VerifyPassportRequest) returns (VerifyPassportResponse);
     rpc Login(LoginRequest) returns (LoginResponse);
-    rpc VerifyNINImage(VerifyIdentityImageRequest) returns (VerifyIdentityImageResponse);
+    rpc VerifyIDImage(VerifyIdentityImageRequest) returns (VerifyIdentityImageResponse);
 
 }
 

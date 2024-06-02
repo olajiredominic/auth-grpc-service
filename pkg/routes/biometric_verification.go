@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-func (h *Handler) VerifyNINImage(ctx context.Context, req *pb.VerifyIdentityImageRequest) (*pb.VerifyIdentityImageResponse, error) {
+func (h *Handler) VerifyIDImage(ctx context.Context, req *pb.VerifyIdentityImageRequest) (*pb.VerifyIdentityImageResponse, error) {
 	// Call the Login function to get the bearer token
 	token, err := h.Login(ctx, &pb.LoginRequest{
 		ClientId:  h.ClientID,
