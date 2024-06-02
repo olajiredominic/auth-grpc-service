@@ -5,21 +5,22 @@ import (
 )
 
 type Config struct {
-	Port            string `mapstructure:"AUTH_SVC_PORT"`
-	DBURL           string `mapstructure:"AUTH_DB_URL"`
-	DBUSER          string `mapstructure:"AUTH_DB_USER"`
-	DBPWD           string `mapstructure:"AUTH_DB_PWD"`
-	JWT_SECRET      string `mapstructure:"JWT_SECRET"`
-	APP_NAME        string `mapstructure:"APP_NAME"`
-	APP_URL         string `mapstructure:"APP_URL"`
-	CLIENT_ID       string `mapstructure:"CLIENT_ID"`
-	SECRET_KEY      string `mapstructure:"SECRET_KEY"`
-	TOKEN_URL       string `mapstructure:"TOKEN_URL"`
-	QOREID_BASE_URL string `mapstructure:"QOREID_BASE_URL"`
-	VNIN_URL        string `mapstructure:"VNIN_URL"`
-	NIN_URL         string `mapstructure:"NIN_URL"`
-	DL_URL          string `mapstructure:"DL_URL"`
-	PASSPORT_URL    string `mapstructure:"PASSPORT_URL"`
+	Port                      string `mapstructure:"AUTH_SVC_PORT"`
+	DBURL                     string `mapstructure:"AUTH_DB_URL"`
+	DBUSER                    string `mapstructure:"AUTH_DB_USER"`
+	DBPWD                     string `mapstructure:"AUTH_DB_PWD"`
+	JWT_SECRET                string `mapstructure:"JWT_SECRET"`
+	APP_NAME                  string `mapstructure:"APP_NAME"`
+	APP_URL                   string `mapstructure:"APP_URL"`
+	CLIENT_ID                 string `mapstructure:"CLIENT_ID"`
+	SECRET_KEY                string `mapstructure:"SECRET_KEY"`
+	TOKEN_URL                 string `mapstructure:"TOKEN_URL"`
+	QOREID_BASE_URL           string `mapstructure:"QOREID_BASE_URL"`
+	VNIN_URL                  string `mapstructure:"VNIN_URL"`
+	NIN_URL                   string `mapstructure:"NIN_URL"`
+	DL_URL                    string `mapstructure:"DL_URL"`
+	PASSPORT_URL              string `mapstructure:"PASSPORT_URL"`
+	BIOMETRIC_QOREID_BASE_URL string `mapstructure:"BIOMETRIC_QOREID_BASE_URL"`
 }
 
 func LoadConfig() (config Config, err error) {

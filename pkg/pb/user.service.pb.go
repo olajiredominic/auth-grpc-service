@@ -7,11 +7,11 @@
 package pb
 
 import (
+	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
-	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	reflect "reflect"
 	sync "sync"
 )

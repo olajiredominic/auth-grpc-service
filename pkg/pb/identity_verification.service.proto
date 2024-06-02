@@ -10,13 +10,27 @@ package identity_verification;
 
 option go_package = "pkg/pb";
 
+// Enum for identity types
+enum IdentityType {
+    NIN = 0;
+    VNIN = 1;
+    NIGERIAN_PASSPORT = 2;
+    BVN = 3;
+    DRIVERS_LICENSE = 4;
+}
+
+// Service definition
 service VerificationService {
     rpc VerifyNIN(VerifyNINRequest) returns (VerifyNINResponse);
     rpc VerifyVNIN(VerifyNINRequest) returns (VerifyNINResponse);
     rpc VerifyDL(VerifyDLRequest) returns (VerifyDLResponse);
     rpc VerifyPassport(VerifyPassportRequest) returns (VerifyPassportResponse);
     rpc Login(LoginRequest) returns (LoginResponse);
+    rpc VerifyNINImage(VerifyIdentityImageRequest) returns (VerifyIdentityImageResponse);
+
 }
+
+
 
 // VerifyNINRequest is the request message for verifying NIN
 message VerifyNINRequest {
@@ -28,6 +42,48 @@ message VerifyNINRequest {
     string phone = 6;
     string email = 7;
     string gender = 8;
+}
+
+// VerifyDLRequest is the request message for verifying Driver's License
+message VerifyDLRequest {
+    string idNumber = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string middlename = 4;
+    string dob = 5;
+    string phone = 6;
+    string email = 7;
+    string gender = 8;
+}
+
+// VerifyPassportRequest is the request message for verifying Passport
+message VerifyPassportRequest {
+    string idNumber = 1;
+    string firstname = 2;
+    string lastname = 3;
+    string middlename = 4;
+    string dob = 5;
+    string phone = 6;
+    string email = 7;
+    string gender = 8;
+}
+
+// Request message for verifying identity image
+message VerifyIdentityImageRequest {
+    IdentityType idType = 1;
+    string idNumber = 2;
+    string photoUrl = 3;
+    string photoBase64 = 4;
+}
+
+// LoginRequest and LoginResponse
+message LoginRequest {
+    string client_id = 1;
+    string secret_key = 2;
+}
+
+message LoginResponse {
+    string token = 1;
 }
 
 // Reused message types with unique names
@@ -67,33 +123,13 @@ message Nin {
     string Address = 9 [ (json_name) = "address"];
 }
 
-// VerifyNINResponse is the response message for verifying NIN
+// Response message for verifying NIN
 message VerifyNINResponse {
     int32 Id = 1 [ (json_name) = "id"];
     ApplicantNIN Applicant = 2 [ (json_name) = "applicant"];
     SummaryNIN Summary = 3 [ (json_name) = "summary"];
     StatusNIN Status = 4 [ (json_name) = "status"];
     Nin Nin = 5 [ (json_name) = "nin"];
-}
-
-message LoginRequest {
-    string client_id = 1;
-    string secret_key = 2;
-}
-
-message LoginResponse {
-    string token = 1;
-}
-
-message VerifyDLRequest {
-    string idNumber = 1;
-    string firstname = 2;
-    string lastname = 3;
-    string middlename = 4;
-    string dob = 5;
-    string phone = 6;
-    string email = 7;
-    string gender = 8;
 }
 
 message ApplicantDL {
@@ -132,23 +168,13 @@ message DriversLicense {
     string StateOfIssue = 9 [ (json_name) = "state_of_issue"];
 }
 
+// Response message for verifying Driver's License
 message VerifyDLResponse {
     int32 Id = 1 [ (json_name) = "id"];
     ApplicantDL Applicant = 2 [ (json_name) = "applicant"];
     SummaryDL Summary = 3 [ (json_name) = "summary"];
     StatusDL Status = 4 [ (json_name) = "status"];
     DriversLicense DriversLicense = 5 [ (json_name) = "drivers_license"];
-}
-
-message VerifyPassportRequest {
-    string idNumber = 1;
-    string firstname = 2;
-    string lastname = 3;
-    string middlename = 4;
-    string dob = 5;
-    string phone = 6;
-    string email = 7;
-    string gender = 8;
 }
 
 message ApplicantPassport {
@@ -188,10 +214,85 @@ message Passport {
     string ExpiryDate = 10 [ (json_name) = "expiry_date"];
 }
 
+// Response message for verifying Passport
 message VerifyPassportResponse {
     int32 Id = 1 [ (json_name) = "id"];
     ApplicantPassport Applicant = 2 [ (json_name) = "applicant"];
     SummaryPassport Summary = 3 [ (json_name) = "summary"];
     StatusPassport Status = 4 [ (json_name) = "status"];
     Passport Passport = 5 [ (json_name) = "passport"];
+}
+
+// Face verification check message
+message FaceVerificationCheck {
+    bool Match = 1 [ (json_name) = "match"];
+    float MatchScore = 2 [ (json_name) = "match_score"];
+    float MatchingThreshold = 3 [ (json_name) = "matching_threshold"];
+    float MaxScore = 4 [ (json_name) = "max_score"];
+}
+
+// Summary message
+message Summary {
+    FaceVerificationCheck FaceVerificationCheck = 1 [ (json_name) = "face_verification_check"];
+}
+
+// Next of kin message
+message NextOfKin {
+    string Firstname = 1 [ (json_name) = "firstname"];
+    string Lastname = 2 [ (json_name) = "lastname"];
+    string Middlename = 3 [ (json_name) = "middlename"];
+    string Address1 = 4 [ (json_name) = "address1"];
+    string Lga = 5 [ (json_name) = "lga"];
+    string State = 6 [ (json_name) = "state"];
+    string Town = 7 [ (json_name) = "town"];
+}
+
+// Residence message
+message Residence {
+    string Address1 = 1 [ (json_name) = "address1"];
+    string Lga = 2 [ (json_name) = "lga"];
+    string State = 3 [ (json_name) = "state"];
+}
+
+// Face verification message
+message FaceVerification {
+    string Nin = 1 [ (json_name) = "nin"];
+    string Title = 2 [ (json_name) = "title"];
+    string Firstname = 3 [ (json_name) = "firstname"];
+    string Lastname = 4 [ (json_name) = "lastname"];
+    string Phone = 5 [ (json_name) = "phone"];
+    string Email = 6 [ (json_name) = "email"];
+    string Gender = 7 [ (json_name) = "gender"];
+    string Height = 8 [ (json_name) = "height"];
+    string Profession = 9 [ (json_name) = "profession"];
+    string MaritalStatus = 10 [ (json_name) = "marital_status"];
+    string EmploymentStatus = 11 [ (json_name) = "employment_status"];
+    string Birthdate = 12 [ (json_name) = "birthdate"];
+    string BirthState = 13 [ (json_name) = "birth_state"];
+    string BirthCountry = 14 [ (json_name) = "birth_country"];
+    NextOfKin NextOfKin = 15 [ (json_name) = "next_of_kin"];
+    string Nspokenlang = 16 [ (json_name) = "nspokenlang"];
+    string Ospokenlang = 17 [ (json_name) = "ospokenlang"];
+    string Photo = 18 [ (json_name) = "photo"];
+    string Religion = 19 [ (json_name) = "religion"];
+    Residence Residence = 20 [ (json_name) = "residence"];
+    string LgaOfOrigin = 21 [ (json_name) = "lga_of_origin"];
+    string PlaceOfOrigin = 22 [ (json_name) = "place_of_origin"];
+    string StateOfOrigin = 23 [ (json_name) = "state_of_origin"];
+    string Signature = 24 [ (json_name) = "signature"];
+    string TrackingId = 25 [ (json_name) = "tracking_id"];
+}
+
+// Status message
+message Status {
+    string State = 1 [ (json_name) = "state"];
+    string Status = 2 [ (json_name) = "status"];
+}
+
+// Response message for verifying identity image
+message VerifyIdentityImageResponse {
+    int32 Id = 1 [ (json_name) = "id"];
+    Summary Summary = 2 [ (json_name) = "summary"];
+    Status Status = 3 [ (json_name) = "status"];
+    FaceVerification FaceVerification = 4 [ (json_name) = "face_verification"];
 }

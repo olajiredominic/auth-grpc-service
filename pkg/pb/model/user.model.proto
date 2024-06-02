@@ -3,9 +3,9 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "pkg/pb/model";
+//option go_package = "pkg/pb/model";
 
-//option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
+option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 message Address {
   option (gorm.opts).ormable = true;
@@ -53,6 +53,14 @@ message User {
     google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
     VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
+}
+// Enum for identity types
+enum IdentityType {
+    NIN = 0;
+    VNIN = 1;
+    NIGERIAN_PASSPORT = 2;
+    BVN = 3;
+    DRIVERS_LICENSE = 4;
 }
 
 enum IdType {

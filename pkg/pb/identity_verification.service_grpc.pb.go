@@ -27,6 +27,7 @@ type VerificationServiceClient interface {
 	VerifyDL(ctx context.Context, in *VerifyDLRequest, opts ...grpc.CallOption) (*VerifyDLResponse, error)
 	VerifyPassport(ctx context.Context, in *VerifyPassportRequest, opts ...grpc.CallOption) (*VerifyPassportResponse, error)
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	VerifyNINImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error)
 }
 
 type verificationServiceClient struct {
@@ -82,6 +83,15 @@ func (c *verificationServiceClient) Login(ctx context.Context, in *LoginRequest,
 	return out, nil
 }
 
+func (c *verificationServiceClient) VerifyNINImage(ctx context.Context, in *VerifyIdentityImageRequest, opts ...grpc.CallOption) (*VerifyIdentityImageResponse, error) {
+	out := new(VerifyIdentityImageResponse)
+	err := c.cc.Invoke(ctx, "/identity_verification.VerificationService/VerifyNINImage", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // VerificationServiceServer is the server API for VerificationService service.
 // All implementations should embed UnimplementedVerificationServiceServer
 // for forward compatibility
@@ -91,6 +101,7 @@ type VerificationServiceServer interface {
 	VerifyDL(context.Context, *VerifyDLRequest) (*VerifyDLResponse, error)
 	VerifyPassport(context.Context, *VerifyPassportRequest) (*VerifyPassportResponse, error)
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
+	VerifyNINImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error)
 }
 
 // UnimplementedVerificationServiceServer should be embedded to have forward compatible implementations.
@@ -111,6 +122,9 @@ func (UnimplementedVerificationServiceServer) VerifyPassport(context.Context, *V
 }
 func (UnimplementedVerificationServiceServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
+}
+func (UnimplementedVerificationServiceServer) VerifyNINImage(context.Context, *VerifyIdentityImageRequest) (*VerifyIdentityImageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyNINImage not implemented")
 }
 
 // UnsafeVerificationServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -214,6 +228,24 @@ func _VerificationService_Login_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _VerificationService_VerifyNINImage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(VerifyIdentityImageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(VerificationServiceServer).VerifyNINImage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/identity_verification.VerificationService/VerifyNINImage",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(VerificationServiceServer).VerifyNINImage(ctx, req.(*VerifyIdentityImageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // VerificationService_ServiceDesc is the grpc.ServiceDesc for VerificationService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -240,6 +272,10 @@ var VerificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Login",
 			Handler:    _VerificationService_Login_Handler,
+		},
+		{
+			MethodName: "VerifyNINImage",
+			Handler:    _VerificationService_VerifyNINImage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

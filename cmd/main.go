@@ -26,17 +26,18 @@ func main() {
 
 	dbUrl := fmt.Sprintf("postgres://%s:%s@%s", config.DBUSER, config.DBPWD, config.DBURL)
 	log.Println("Database Url", dbUrl)
-	handler := routes.Init(dbUrl, config.CLIENT_ID, config.SECRET_KEY, config.TOKEN_URL, config.QOREID_BASE_URL, config.VNIN_URL, config.NIN_URL, config.DL_URL, config.PASSPORT_URL)
+	handler := routes.Init(dbUrl, config.CLIENT_ID, config.SECRET_KEY, config.TOKEN_URL, config.QOREID_BASE_URL, config.VNIN_URL, config.NIN_URL, config.DL_URL, config.PASSPORT_URL, config.BIOMETRIC_QOREID_BASE_URL)
 	h := routes.Handler{
-		DB:            handler.DB,
-		ClientID:      config.CLIENT_ID,
-		SecretKey:     config.SECRET_KEY,
-		TokenURL:      config.TOKEN_URL,
-		QoreidBaseURL: config.QOREID_BASE_URL,
-		VNINURL:       config.VNIN_URL,
-		NINURL:        config.NIN_URL,
-		DLURL:         config.DL_URL,
-		PassportURL:   config.PASSPORT_URL,
+		DB:                     handler.DB,
+		ClientID:               config.CLIENT_ID,
+		SecretKey:              config.SECRET_KEY,
+		TokenURL:               config.TOKEN_URL,
+		QoreidBaseURL:          config.QOREID_BASE_URL,
+		VNINURL:                config.VNIN_URL,
+		NINURL:                 config.NIN_URL,
+		DLURL:                  config.DL_URL,
+		PassportURL:            config.PASSPORT_URL,
+		BiometricQoreidBaseURL: config.BIOMETRIC_QOREID_BASE_URL,
 	}
 
 	grpcServer := grpc.NewServer()

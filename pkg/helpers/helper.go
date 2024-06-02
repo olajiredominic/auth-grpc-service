@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/lerryjay/auth-grpc-service/pkg/pb"
+
 	"github.com/lerryjay/auth-grpc-service/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -154,4 +156,21 @@ func ValidateJWTToken(token string) (string, error) {
 	json.Unmarshal(payload, &data)
 	// This means the token matches
 	return data["user"], nil
+}
+
+func GetImageVerificationURL(idType pb.IdentityType) (string, error) {
+	switch idType {
+	case pb.IdentityType_NIN:
+		return "nin", nil
+	case pb.IdentityType_VNIN:
+		return "vnin", nil
+	case pb.IdentityType_NIGERIAN_PASSPORT:
+		return "nigerian-passport", nil
+	case pb.IdentityType_BVN:
+		return "bvn", nil
+	case pb.IdentityType_DRIVERS_LICENSE:
+		return "drivers-license", nil
+	default:
+		return "", fmt.Errorf("invalid identity type: %v", idType)
+	}
 }
