@@ -439,3 +439,25 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 
 	return response, nil
 }
+
+func (h *Handler) UpdateUserProfilePicture(ctx context.Context, req *pb.UpdateProfilePictureRequest) (*models.User, error) {
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		log.Println("Error fetching user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.NotFound, "User not found")
+	}
+
+	user.ImageUrl = req.ProfilePicturePath
+	h.DB.Save(&user)
+
+	// Convert the ORM user back to the protobuf User model if needed
+	updatedUser := &models.User{
+		Id:       user.Id,
+		Email:    user.Email,
+		Role:     user.Role,
+		ImageUrl: user.ImageUrl,
+	}
+
+	return updatedUser, nil
+}
