@@ -32,6 +32,7 @@ type UserServiceClient interface {
 	UpdateUserIDImage(ctx context.Context, in *UpdateIDImageRequest, opts ...grpc.CallOption) (*UpdateIDImageResponse, error)
 	UpdateUserIDNumber(ctx context.Context, in *UpdateIDNumberRequest, opts ...grpc.CallOption) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(ctx context.Context, in *UpdateSelfieRequest, opts ...grpc.CallOption) (*UpdateSelfieResponse, error)
+	UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error)
 }
 
 type userServiceClient struct {
@@ -114,6 +115,15 @@ func (c *userServiceClient) UpdateUserSelfie(ctx context.Context, in *UpdateSelf
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error) {
+	out := new(model.User)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserProfilePicture", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -126,6 +136,7 @@ type UserServiceServer interface {
 	UpdateUserIDImage(context.Context, *UpdateIDImageRequest) (*UpdateIDImageResponse, error)
 	UpdateUserIDNumber(context.Context, *UpdateIDNumberRequest) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error)
+	UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
@@ -155,6 +166,9 @@ func (UnimplementedUserServiceServer) UpdateUserIDNumber(context.Context, *Updat
 }
 func (UnimplementedUserServiceServer) UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSelfie not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserProfilePicture not implemented")
 }
 
 // UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -312,6 +326,24 @@ func _UserService_UpdateUserSelfie_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateUserProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProfilePictureRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUserProfilePicture(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateUserProfilePicture",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUserProfilePicture(ctx, req.(*UpdateProfilePictureRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -350,6 +382,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserSelfie",
 			Handler:    _UserService_UpdateUserSelfie_Handler,
+		},
+		{
+			MethodName: "UpdateUserProfilePicture",
+			Handler:    _UserService_UpdateUserProfilePicture_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

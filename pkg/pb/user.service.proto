@@ -26,6 +26,9 @@ service UserService {
   rpc UpdateUserIDNumber (UpdateIDNumberRequest) returns (UpdateIDNumberResponse) {}
 
    rpc UpdateUserSelfie (UpdateSelfieRequest) returns (UpdateSelfieResponse) {}
+
+  rpc UpdateUserProfilePicture(UpdateProfilePictureRequest) returns (User);
+
 }
 
 message ListUsersRequest {
@@ -100,4 +103,15 @@ message UpdateSelfieRequest {
 message UpdateSelfieResponse {
  bool Success = 1; // Whether the update was successful.
  User user = 2;
+}
+
+message UpdateProfilePictureRequest {
+    string UserId = 1;
+    string ProfilePicturePath = 2;
+}
+
+// Define the response message for updating the user profile picture
+message UpdateProfilePictureResponse {
+    string Message = 1;
+    google.protobuf.Timestamp UpdatedAt = 2;
 }
