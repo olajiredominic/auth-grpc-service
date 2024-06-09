@@ -497,7 +497,6 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 	return response, nil
 }
 
-<<<<<<< HEAD
 func (h *Handler) UpdateUserIDType(ctx context.Context, req *pb.UpdateIDTypeRequest) (*pb.UpdateIDTypeResponse, error) {
 	// Fetch the user from the UserORM table
 	var user models.UserORM
@@ -552,7 +551,7 @@ func (h *Handler) UpdateUserIDType(ctx context.Context, req *pb.UpdateIDTypeRequ
 	}
 
 	return response, nil
-=======
+}
 func (h *Handler) UpdateUserProfilePicture(ctx context.Context, req *pb.UpdateProfilePictureRequest) (*models.User, error) {
 	var user models.UserORM
 	query := h.DB.First(&user, "id = ?", req.UserId)
@@ -627,5 +626,4 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 	}
 
 	return updatedAddress, nil
->>>>>>> master
 }
