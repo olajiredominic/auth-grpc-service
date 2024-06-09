@@ -461,3 +461,36 @@ func (h *Handler) UpdateUserProfilePicture(ctx context.Context, req *pb.UpdatePr
 
 	return updatedUser, nil
 }
+
+func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddressRequest) (*models.Address, error) {
+	var address models.AddressORM
+	query := h.DB.First(&address, "id = ?", req.UserId)
+	if query.Error != nil {
+		log.Println("Error fetching address for user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.NotFound, "User address not found")
+	}
+
+	// Update the address fields
+	address.Address = req.Address.Address
+	address.City = req.Address.City
+	address.State = req.Address.State
+	address.Zip = req.Address.Zip
+	address.Country = req.Address.Country
+	address.Type = req.Address.Type
+
+	// Save the updated address
+	h.DB.Save(&address)
+
+	// Convert the ORM address back to the protobuf Address model if needed
+	updatedAddress := &models.Address{
+		Address: address.Address,
+		City:    address.City,
+		State:   address.State,
+		Zip:     address.Zip,
+		Country: address.Country,
+		Type:    address.Type,
+		UserId:  address.UserId,
+	}
+
+	return updatedAddress, nil
+}

@@ -8,11 +8,11 @@ package pb
 
 import (
 	context "context"
-	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	model "pkg/pb/model"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -33,6 +33,7 @@ type UserServiceClient interface {
 	UpdateUserIDNumber(ctx context.Context, in *UpdateIDNumberRequest, opts ...grpc.CallOption) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(ctx context.Context, in *UpdateSelfieRequest, opts ...grpc.CallOption) (*UpdateSelfieResponse, error)
 	UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error)
+	UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.User, error)
 }
 
 type userServiceClient struct {
@@ -124,6 +125,15 @@ func (c *userServiceClient) UpdateUserProfilePicture(ctx context.Context, in *Up
 	return out, nil
 }
 
+func (c *userServiceClient) UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.User, error) {
+	out := new(model.User)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -137,6 +147,7 @@ type UserServiceServer interface {
 	UpdateUserIDNumber(context.Context, *UpdateIDNumberRequest) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error)
 	UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error)
+	UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.User, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
@@ -169,6 +180,9 @@ func (UnimplementedUserServiceServer) UpdateUserSelfie(context.Context, *UpdateS
 }
 func (UnimplementedUserServiceServer) UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserProfilePicture not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.User, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserAddress not implemented")
 }
 
 // UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -344,6 +358,24 @@ func _UserService_UpdateUserProfilePicture_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_UpdateUserAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateUserAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUserAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateUserAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUserAddress(ctx, req.(*UpdateUserAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -386,6 +418,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserProfilePicture",
 			Handler:    _UserService_UpdateUserProfilePicture_Handler,
+		},
+		{
+			MethodName: "UpdateUserAddress",
+			Handler:    _UserService_UpdateUserAddress_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
