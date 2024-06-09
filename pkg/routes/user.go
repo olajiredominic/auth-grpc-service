@@ -190,6 +190,10 @@ func (h *Handler) UpdateUser(ctx context.Context, req *models.User) (*models.Use
 	userData.UpdatedAt = user.UpdatedAt
 	userData.Role = user.Role
 	userData.Email = user.Email
+	userData.VerificationStatus = user.VerificationStatus
+	userData.ImageUrl = user.ImageUrl
+	userData.Username = user.Username
+
 	h.DB.Save(&userData)
 
 	return req, nil
