@@ -3,11 +3,11 @@ package model
 import (
 	context "context"
 	fmt "fmt"
-	gorm1 "github.com/infobloxopen/atlas-app-toolkit/gorm"
+	gorm1 "github.com/infobloxopen/atlas-app-toolkit/v2/gorm"
 	errors "github.com/infobloxopen/protoc-gen-gorm/errors"
-	gorm "github.com/jinzhu/gorm"
 	field_mask "google.golang.org/genproto/protobuf/field_mask"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
+	gorm "gorm.io/gorm"
 	strings "strings"
 	time "time"
 )
@@ -17,12 +17,11 @@ type AddressORM struct {
 	City      string
 	Country   string
 	CreatedAt *time.Time
-	Id        int32 `gorm:"type:integer;primary_key"`
+	Id        int32 `gorm:"type:integer;primaryKey"`
 	State     string
 	Type      string
 	UpdatedAt *time.Time
-	User      *UserORM `gorm:"foreignkey:UserId;association_foreignkey:Id"`
-	UserId    *string
+	UserId    string
 	Zip       string
 }
 
@@ -48,13 +47,7 @@ func (m *Address) ToORM(ctx context.Context) (AddressORM, error) {
 	to.Zip = m.Zip
 	to.Country = m.Country
 	to.Type = m.Type
-	if m.User != nil {
-		tempUser, err := m.User.ToORM(ctx)
-		if err != nil {
-			return to, err
-		}
-		to.User = &tempUser
-	}
+	to.UserId = m.UserId
 	if m.CreatedAt != nil {
 		t := m.CreatedAt.AsTime()
 		to.CreatedAt = &t
@@ -86,13 +79,7 @@ func (m *AddressORM) ToPB(ctx context.Context) (Address, error) {
 	to.Zip = m.Zip
 	to.Country = m.Country
 	to.Type = m.Type
-	if m.User != nil {
-		tempUser, err := m.User.ToPB(ctx)
-		if err != nil {
-			return to, err
-		}
-		to.User = &tempUser
-	}
+	to.UserId = m.UserId
 	if m.CreatedAt != nil {
 		to.CreatedAt = timestamppb.New(*m.CreatedAt)
 	}
@@ -130,11 +117,11 @@ type AddressWithAfterToPB interface {
 
 type UserPermissionORM struct {
 	CreatedAt  *time.Time
-	Id         int32 `gorm:"type:integer;primary_key"`
+	Id         int32 `gorm:"type:integer;primaryKey"`
 	Permission string
 	Status     int32
 	UpdatedAt  *time.Time
-	User       *UserORM `gorm:"foreignkey:UserId;association_foreignkey:Id"`
+	User       *UserORM `gorm:"foreignKey:UserId;references:Id"`
 	UserId     *string
 }
 
@@ -237,7 +224,7 @@ type UserORM struct {
 	CreatedAt          *time.Time
 	Email              string
 	Firstname          string
-	Id                 string `gorm:"type:uuid;primary_key"`
+	Id                 string `gorm:"type:uuid;primaryKey"`
 	ImageUrl           string
 	Lastname           string
 	Password           string
@@ -353,7 +340,7 @@ type UserVerificationORM struct {
 	IdNumber    string
 	IdType      int32
 	Selfie      string
-	User        *UserORM `gorm:"foreignkey:UserId;association_foreignkey:Id"`
+	User        *UserORM `gorm:"foreignKey:UserId;references:Id"`
 	UserId      *string
 }
 
@@ -455,7 +442,7 @@ func DefaultCreateAddress(ctx context.Context, in *Address, db *gorm.DB) (*Addre
 			return nil, err
 		}
 	}
-	if err = db.Create(&ormObj).Error; err != nil {
+	if err = db.Omit().Create(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(AddressORMWithAfterCreate_); ok {
@@ -489,9 +476,6 @@ func DefaultReadAddress(ctx context.Context, in *Address, db *gorm.DB) (*Address
 		if db, err = hook.BeforeReadApplyQuery(ctx, db); err != nil {
 			return nil, err
 		}
-	}
-	if db, err = gorm1.ApplyFieldSelection(ctx, db, nil, &AddressORM{}); err != nil {
-		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(AddressORMWithBeforeReadFind); ok {
 		if db, err = hook.BeforeReadFind(ctx, db); err != nil {
@@ -613,7 +597,7 @@ func DefaultStrictUpdateAddress(ctx context.Context, in *Address, db *gorm.DB) (
 			return nil, err
 		}
 	}
-	if err = db.Save(&ormObj).Error; err != nil {
+	if err = db.Omit().Save(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(AddressORMWithAfterStrictUpdateSave); ok {
@@ -720,7 +704,6 @@ func DefaultApplyFieldMaskAddress(ctx context.Context, patchee *Address, patcher
 		return nil, errors.NilArgumentError
 	}
 	var err error
-	var updatedUser bool
 	var updatedCreatedAt bool
 	var updatedUpdatedAt bool
 	for i, f := range updateMask.Paths {
@@ -752,25 +735,8 @@ func DefaultApplyFieldMaskAddress(ctx context.Context, patchee *Address, patcher
 			patchee.Type = patcher.Type
 			continue
 		}
-		if !updatedUser && strings.HasPrefix(f, prefix+"User.") {
-			updatedUser = true
-			if patcher.User == nil {
-				patchee.User = nil
-				continue
-			}
-			if patchee.User == nil {
-				patchee.User = &User{}
-			}
-			if o, err := DefaultApplyFieldMaskUser(ctx, patchee.User, patcher.User, &field_mask.FieldMask{Paths: updateMask.Paths[i:]}, prefix+"User.", db); err != nil {
-				return nil, err
-			} else {
-				patchee.User = o
-			}
-			continue
-		}
-		if f == prefix+"User" {
-			updatedUser = true
-			patchee.User = patcher.User
+		if f == prefix+"UserId" {
+			patchee.UserId = patcher.UserId
 			continue
 		}
 		if !updatedCreatedAt && strings.HasPrefix(f, prefix+"CreatedAt.") {
@@ -838,10 +804,6 @@ func DefaultListAddress(ctx context.Context, db *gorm.DB) ([]*Address, error) {
 			return nil, err
 		}
 	}
-	db, err = gorm1.ApplyCollectionOperators(ctx, db, &AddressORM{}, &Address{}, nil, nil, nil, nil)
-	if err != nil {
-		return nil, err
-	}
 	if hook, ok := interface{}(&ormObj).(AddressORMWithBeforeListFind); ok {
 		if db, err = hook.BeforeListFind(ctx, db); err != nil {
 			return nil, err
@@ -893,7 +855,7 @@ func DefaultCreateUserPermission(ctx context.Context, in *UserPermission, db *go
 			return nil, err
 		}
 	}
-	if err = db.Create(&ormObj).Error; err != nil {
+	if err = db.Omit().Create(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserPermissionORMWithAfterCreate_); ok {
@@ -927,9 +889,6 @@ func DefaultReadUserPermission(ctx context.Context, in *UserPermission, db *gorm
 		if db, err = hook.BeforeReadApplyQuery(ctx, db); err != nil {
 			return nil, err
 		}
-	}
-	if db, err = gorm1.ApplyFieldSelection(ctx, db, nil, &UserPermissionORM{}); err != nil {
-		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserPermissionORMWithBeforeReadFind); ok {
 		if db, err = hook.BeforeReadFind(ctx, db); err != nil {
@@ -1051,7 +1010,7 @@ func DefaultStrictUpdateUserPermission(ctx context.Context, in *UserPermission, 
 			return nil, err
 		}
 	}
-	if err = db.Save(&ormObj).Error; err != nil {
+	if err = db.Omit().Save(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserPermissionORMWithAfterStrictUpdateSave); ok {
@@ -1260,10 +1219,6 @@ func DefaultListUserPermission(ctx context.Context, db *gorm.DB) ([]*UserPermiss
 			return nil, err
 		}
 	}
-	db, err = gorm1.ApplyCollectionOperators(ctx, db, &UserPermissionORM{}, &UserPermission{}, nil, nil, nil, nil)
-	if err != nil {
-		return nil, err
-	}
 	if hook, ok := interface{}(&ormObj).(UserPermissionORMWithBeforeListFind); ok {
 		if db, err = hook.BeforeListFind(ctx, db); err != nil {
 			return nil, err
@@ -1315,7 +1270,7 @@ func DefaultCreateUser(ctx context.Context, in *User, db *gorm.DB) (*User, error
 			return nil, err
 		}
 	}
-	if err = db.Create(&ormObj).Error; err != nil {
+	if err = db.Omit().Create(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserORMWithAfterCreate_); ok {
@@ -1349,9 +1304,6 @@ func DefaultReadUser(ctx context.Context, in *User, db *gorm.DB) (*User, error) 
 		if db, err = hook.BeforeReadApplyQuery(ctx, db); err != nil {
 			return nil, err
 		}
-	}
-	if db, err = gorm1.ApplyFieldSelection(ctx, db, nil, &UserORM{}); err != nil {
-		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserORMWithBeforeReadFind); ok {
 		if db, err = hook.BeforeReadFind(ctx, db); err != nil {
@@ -1473,7 +1425,7 @@ func DefaultStrictUpdateUser(ctx context.Context, in *User, db *gorm.DB) (*User,
 			return nil, err
 		}
 	}
-	if err = db.Save(&ormObj).Error; err != nil {
+	if err = db.Omit().Save(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserORMWithAfterStrictUpdateSave); ok {
@@ -1696,10 +1648,6 @@ func DefaultListUser(ctx context.Context, db *gorm.DB) ([]*User, error) {
 			return nil, err
 		}
 	}
-	db, err = gorm1.ApplyCollectionOperators(ctx, db, &UserORM{}, &User{}, nil, nil, nil, nil)
-	if err != nil {
-		return nil, err
-	}
 	if hook, ok := interface{}(&ormObj).(UserORMWithBeforeListFind); ok {
 		if db, err = hook.BeforeListFind(ctx, db); err != nil {
 			return nil, err
@@ -1751,7 +1699,7 @@ func DefaultCreateUserVerification(ctx context.Context, in *UserVerification, db
 			return nil, err
 		}
 	}
-	if err = db.Create(&ormObj).Error; err != nil {
+	if err = db.Omit().Create(&ormObj).Error; err != nil {
 		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserVerificationORMWithAfterCreate_); ok {
@@ -1839,10 +1787,6 @@ func DefaultListUserVerification(ctx context.Context, db *gorm.DB) ([]*UserVerif
 		if db, err = hook.BeforeListApplyQuery(ctx, db); err != nil {
 			return nil, err
 		}
-	}
-	db, err = gorm1.ApplyCollectionOperators(ctx, db, &UserVerificationORM{}, &UserVerification{}, nil, nil, nil, nil)
-	if err != nil {
-		return nil, err
 	}
 	if hook, ok := interface{}(&ormObj).(UserVerificationORMWithBeforeListFind); ok {
 		if db, err = hook.BeforeListFind(ctx, db); err != nil {

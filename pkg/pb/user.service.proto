@@ -29,6 +29,9 @@ service UserService {
 
   rpc UpdateUserProfilePicture(UpdateProfilePictureRequest) returns (User);
 
+    rpc UpdateUserAddress(UpdateUserAddressRequest) returns (Address);
+
+
 }
 
 message ListUsersRequest {
@@ -114,4 +117,8 @@ message UpdateProfilePictureRequest {
 message UpdateProfilePictureResponse {
     string Message = 1;
     google.protobuf.Timestamp UpdatedAt = 2;
+}
+message UpdateUserAddressRequest {
+  string UserId = 1;
+  Address Address = 2;
 }
