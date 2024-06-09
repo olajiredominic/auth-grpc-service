@@ -16,9 +16,10 @@ message Address {
   string Zip = 5;
   string Country = 6;
   string Type = 7;
-  User User = 8 [(gorm.field).belongs_to = {}];
+  string UserId = 11;
   google.protobuf.Timestamp  CreatedAt  = 9;
   google.protobuf.Timestamp  UpdatedAt  = 10;
+  
 }
 
 enum Status {

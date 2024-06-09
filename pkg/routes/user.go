@@ -193,6 +193,10 @@ func (h *Handler) UpdateUser(ctx context.Context, req *models.User) (*models.Use
 	userData.UpdatedAt = user.UpdatedAt
 	userData.Role = user.Role
 	userData.Email = user.Email
+	userData.VerificationStatus = user.VerificationStatus
+	userData.ImageUrl = user.ImageUrl
+	userData.Username = user.Username
+
 	h.DB.Save(&userData)
 
 	return req, nil
@@ -493,6 +497,7 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 	return response, nil
 }
 
+<<<<<<< HEAD
 func (h *Handler) UpdateUserIDType(ctx context.Context, req *pb.UpdateIDTypeRequest) (*pb.UpdateIDTypeResponse, error) {
 	// Fetch the user from the UserORM table
 	var user models.UserORM
@@ -547,4 +552,80 @@ func (h *Handler) UpdateUserIDType(ctx context.Context, req *pb.UpdateIDTypeRequ
 	}
 
 	return response, nil
+=======
+func (h *Handler) UpdateUserProfilePicture(ctx context.Context, req *pb.UpdateProfilePictureRequest) (*models.User, error) {
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.UserId)
+	if query.Error != nil {
+		log.Println("Error fetching user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.NotFound, "User not found")
+	}
+
+	user.ImageUrl = req.ProfilePicturePath
+	h.DB.Save(&user)
+
+	// Convert the ORM user back to the protobuf User model if needed
+	updatedUser := &models.User{
+		Id:       user.Id,
+		Email:    user.Email,
+		Role:     user.Role,
+		ImageUrl: user.ImageUrl,
+	}
+
+	return updatedUser, nil
+}
+
+func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddressRequest) (*models.Address, error) {
+	var address models.AddressORM
+	query := h.DB.First(&address, "user_id = ?", req.UserId)
+
+	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+		// If the address is not found, create a new address entry
+		address = models.AddressORM{
+			Address: req.Address.Address,
+			City:    req.Address.City,
+			State:   req.Address.State,
+			Zip:     req.Address.Zip,
+			Country: req.Address.Country,
+			Type:    req.Address.Type,
+			UserId:  req.UserId,
+		}
+
+		if err := h.DB.Create(&address).Error; err != nil {
+			log.Println("Error creating new address for user ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Error creating new address")
+		}
+	} else if query.Error != nil {
+		log.Println("Error fetching address for user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.Internal, "Error fetching address")
+	} else {
+		// If the address exists, update the address fields
+		address.Address = req.Address.Address
+		address.City = req.Address.City
+		address.State = req.Address.State
+		address.Zip = req.Address.Zip
+		address.Country = req.Address.Country
+		address.Type = req.Address.Type
+
+		// Save the updated address
+		if err := h.DB.Save(&address).Error; err != nil {
+			log.Println("Error updating address for user ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Error updating address")
+		}
+	}
+
+	// Convert the ORM address back to the protobuf Address model if needed
+	updatedAddress := &models.Address{
+		Id:      address.Id,
+		Address: address.Address,
+		City:    address.City,
+		State:   address.State,
+		Zip:     address.Zip,
+		Country: address.Country,
+		Type:    address.Type,
+		UserId:  address.UserId,
+	}
+
+	return updatedAddress, nil
+>>>>>>> master
 }
