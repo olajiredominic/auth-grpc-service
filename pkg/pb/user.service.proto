@@ -29,7 +29,7 @@ service UserService {
 
   rpc UpdateUserProfilePicture(UpdateProfilePictureRequest) returns (User);
 
-    rpc UpdateUserAddress(UpdateUserAddressRequest) returns (User);
+    rpc UpdateUserAddress(UpdateUserAddressRequest) returns (Address);
 
 
 }

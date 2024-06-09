@@ -8,11 +8,11 @@ package pb
 
 import (
 	context "context"
+	model "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	model "pkg/pb/model"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -33,7 +33,7 @@ type UserServiceClient interface {
 	UpdateUserIDNumber(ctx context.Context, in *UpdateIDNumberRequest, opts ...grpc.CallOption) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(ctx context.Context, in *UpdateSelfieRequest, opts ...grpc.CallOption) (*UpdateSelfieResponse, error)
 	UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error)
-	UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.User, error)
+	UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.Address, error)
 }
 
 type userServiceClient struct {
@@ -125,8 +125,8 @@ func (c *userServiceClient) UpdateUserProfilePicture(ctx context.Context, in *Up
 	return out, nil
 }
 
-func (c *userServiceClient) UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.User, error) {
-	out := new(model.User)
+func (c *userServiceClient) UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.Address, error) {
+	out := new(model.Address)
 	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserAddress", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -147,7 +147,7 @@ type UserServiceServer interface {
 	UpdateUserIDNumber(context.Context, *UpdateIDNumberRequest) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error)
 	UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error)
-	UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.User, error)
+	UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.Address, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
@@ -181,7 +181,7 @@ func (UnimplementedUserServiceServer) UpdateUserSelfie(context.Context, *UpdateS
 func (UnimplementedUserServiceServer) UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserProfilePicture not implemented")
 }
-func (UnimplementedUserServiceServer) UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.User, error) {
+func (UnimplementedUserServiceServer) UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.Address, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserAddress not implemented")
 }
 
