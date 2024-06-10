@@ -75,6 +75,7 @@ enum VerificationStatus {
   PROCESSING = 1;
   VERIFIED = 2;
   FAILED = 3;
+  PARTIAL = 4;
 }
 
 message UserVerification {
