@@ -22,6 +22,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// `
 type LoginUserRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

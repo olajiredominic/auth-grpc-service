@@ -33,9 +33,13 @@ service AuthService {
 
   rpc UpdateUserPermissions(UpdateUserPermissionsRequest) returns (UpdateUserPermissionsResponse) { }
 
+  //rpc Login(LoginRequest) returns (LoginResponse);
+
   // rpc CreateServiceRole(CreateServiceRoleRequest) returns (CreateServiceRoleResponse) { }
 }
 
+
+// `
 message LoginUserRequest {
   // The Login Id
   string LoginId = 1;

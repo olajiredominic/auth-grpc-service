@@ -32,6 +32,8 @@ type UserServiceClient interface {
 	UpdateUserIDImage(ctx context.Context, in *UpdateIDImageRequest, opts ...grpc.CallOption) (*UpdateIDImageResponse, error)
 	UpdateUserIDNumber(ctx context.Context, in *UpdateIDNumberRequest, opts ...grpc.CallOption) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(ctx context.Context, in *UpdateSelfieRequest, opts ...grpc.CallOption) (*UpdateSelfieResponse, error)
+	VerifyUser(ctx context.Context, in *model.UserVerification, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateUserIDType(ctx context.Context, in *UpdateIDTypeRequest, opts ...grpc.CallOption) (*UpdateIDTypeResponse, error)
 	UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error)
 	UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.Address, error)
 }
@@ -116,6 +118,24 @@ func (c *userServiceClient) UpdateUserSelfie(ctx context.Context, in *UpdateSelf
 	return out, nil
 }
 
+func (c *userServiceClient) VerifyUser(ctx context.Context, in *model.UserVerification, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/user.UserService/VerifyUser", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userServiceClient) UpdateUserIDType(ctx context.Context, in *UpdateIDTypeRequest, opts ...grpc.CallOption) (*UpdateIDTypeResponse, error) {
+	out := new(UpdateIDTypeResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserIDType", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *userServiceClient) UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error) {
 	out := new(model.User)
 	err := c.cc.Invoke(ctx, "/user.UserService/UpdateUserProfilePicture", in, out, opts...)
@@ -146,6 +166,8 @@ type UserServiceServer interface {
 	UpdateUserIDImage(context.Context, *UpdateIDImageRequest) (*UpdateIDImageResponse, error)
 	UpdateUserIDNumber(context.Context, *UpdateIDNumberRequest) (*UpdateIDNumberResponse, error)
 	UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error)
+	VerifyUser(context.Context, *model.UserVerification) (*emptypb.Empty, error)
+	UpdateUserIDType(context.Context, *UpdateIDTypeRequest) (*UpdateIDTypeResponse, error)
 	UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error)
 	UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.Address, error)
 }
@@ -177,6 +199,12 @@ func (UnimplementedUserServiceServer) UpdateUserIDNumber(context.Context, *Updat
 }
 func (UnimplementedUserServiceServer) UpdateUserSelfie(context.Context, *UpdateSelfieRequest) (*UpdateSelfieResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserSelfie not implemented")
+}
+func (UnimplementedUserServiceServer) VerifyUser(context.Context, *model.UserVerification) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyUser not implemented")
+}
+func (UnimplementedUserServiceServer) UpdateUserIDType(context.Context, *UpdateIDTypeRequest) (*UpdateIDTypeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserIDType not implemented")
 }
 func (UnimplementedUserServiceServer) UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserProfilePicture not implemented")
@@ -340,6 +368,42 @@ func _UserService_UpdateUserSelfie_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_VerifyUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(model.UserVerification)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).VerifyUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/VerifyUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).VerifyUser(ctx, req.(*model.UserVerification))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserService_UpdateUserIDType_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateIDTypeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).UpdateUserIDType(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/UpdateUserIDType",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).UpdateUserIDType(ctx, req.(*UpdateIDTypeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _UserService_UpdateUserProfilePicture_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateProfilePictureRequest)
 	if err := dec(in); err != nil {
@@ -414,6 +478,14 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserSelfie",
 			Handler:    _UserService_UpdateUserSelfie_Handler,
+		},
+		{
+			MethodName: "VerifyUser",
+			Handler:    _UserService_VerifyUser_Handler,
+		},
+		{
+			MethodName: "UpdateUserIDType",
+			Handler:    _UserService_UpdateUserIDType_Handler,
 		},
 		{
 			MethodName: "UpdateUserProfilePicture",

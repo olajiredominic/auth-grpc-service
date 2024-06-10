@@ -4,6 +4,7 @@ import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
 //option go_package = "pkg/pb/model";
+
 option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 message Address {
@@ -54,6 +55,14 @@ message User {
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
     VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
 }
+// Enum for identity types
+enum IdentityType {
+    NIN = 0;
+    VNIN = 1;
+    NIGERIAN_PASSPORT = 2;
+    BVN = 3;
+    DRIVERS_LICENSE = 4;
+}
 
 enum IdType {
   DRIVERS_LICENCE = 0;
@@ -76,6 +85,8 @@ message UserVerification {
   string IdFilePath = 4;
   string IdNumber = 5;
   User User = 6 [(gorm.field).belongs_to = {association_foreignkey: "id"}];
+  string FirstName = 7;
+  string LastName = 8;
  }
  
 
