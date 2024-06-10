@@ -27,7 +27,7 @@ service UserService {
 
    rpc UpdateUserSelfie(UpdateSelfieRequest) returns (UpdateSelfieResponse) {}
 
-   rpc VerifyUser(UserVerification) returns (google.protobuf.Empty) {}
+   rpc VerifyUser(VerifyUserRequest) returns (google.protobuf.Empty) {}
    rpc UpdateUserIDType(UpdateIDTypeRequest) returns (UpdateIDTypeResponse) {}
 
 
@@ -136,4 +136,12 @@ message UpdateProfilePictureResponse {
 message UpdateUserAddressRequest {
   string UserId = 1;
   Address Address = 2;
+}
+
+message VerifyUserRequest {
+ string UserId = 1; // The ID of the user.
+ string IdNumber = 2; // The new ID number of the user.
+ string Firstname = 3;
+ string Lastname = 4;
+ IdType IdType = 5;
 }

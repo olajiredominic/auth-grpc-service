@@ -216,10 +216,10 @@ func (h *Handler) DeleteUser(ctx context.Context, req *pb.DeleteUserRequest) (*e
 
 }
 
-func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) (*emptypb.Empty, error) {
+func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*emptypb.Empty, error) {
 	// Check if user with the provided ID already exists
 	var existingUser models.UserORM
-	query := h.DB.First(&existingUser, "id =?", req.User.Id)
+	query := h.DB.First(&existingUser, "id =?", req.UserId)
 	if query.Error != nil {
 		log.Println("User not found for verification:", query.Error)
 		return nil, status.Errorf(codes.NotFound, "User not found for verification")
@@ -230,8 +230,8 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	case models.IdType_DRIVERS_LICENCE:
 		res, err := h.VerifyDL(ctx, &pb.VerifyDLRequest{
 			IdNumber:  string(req.IdNumber),
-			Firstname: req.FirstName,
-			Lastname:  req.LastName,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
 			// Other fields...
 		})
 
@@ -250,8 +250,8 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	case models.IdType_PASSPORT:
 		res, err := h.VerifyPassport(ctx, &pb.VerifyPassportRequest{
 			IdNumber:  string(req.IdNumber),
-			Firstname: req.FirstName,
-			Lastname:  req.LastName,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
 			// Other fields...
 		})
 
@@ -270,8 +270,8 @@ func (h *Handler) VerifyUser(ctx context.Context, req *models.UserVerification) 
 	case models.IdType_IDENTITY_CARD:
 		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
 			IdNumber:  string(req.IdNumber),
-			Firstname: req.FirstName,
-			Lastname:  req.LastName,
+			Firstname: req.Firstname,
+			Lastname:  req.Lastname,
 			// Other fields...
 		})
 
