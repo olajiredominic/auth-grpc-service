@@ -17,6 +17,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.User, error) {
@@ -64,14 +65,28 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 		return nil, status.Errorf(codes.NotFound,
 			"User not found")
 	}
-	userData, err := user.ToPB(ctx)
-	if err != nil {
-		log.Println(query.Error)
-		return nil, status.Errorf(codes.Internal,
-			"Unable to convert user ")
+	var createdAt *timestamppb.Timestamp
+	if user.CreatedAt != nil {
+		createdAt = timestamppb.New(*user.CreatedAt)
 	}
-
-	return &userData, nil
+	var updatedAt *timestamppb.Timestamp
+	if user.UpdatedAt != nil {
+		updatedAt = timestamppb.New(*user.UpdatedAt)
+	}
+	userData := &models.User{
+		Id:                 user.Id,
+		Email:              user.Email,
+		Firstname:          user.Firstname,
+		Lastname:           user.Lastname,
+		Role:               user.Role,
+		ImageUrl:           user.ImageUrl,
+		Username:           user.Username,
+		Bio:                user.Bio,
+		VerificationStatus: models.VerificationStatus(user.VerificationStatus),
+		CreatedAt:          createdAt,
+		UpdatedAt:          updatedAt,
+	}
+	return userData, nil
 }
 
 func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.ListUsersResponse, error) {
