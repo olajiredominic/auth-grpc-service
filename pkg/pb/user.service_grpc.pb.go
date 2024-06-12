@@ -37,6 +37,7 @@ type UserServiceClient interface {
 	UpdateUserProfilePicture(ctx context.Context, in *UpdateProfilePictureRequest, opts ...grpc.CallOption) (*model.User, error)
 	UpdateUserAddress(ctx context.Context, in *UpdateUserAddressRequest, opts ...grpc.CallOption) (*model.Address, error)
 	UpdateUserVerificationNames(ctx context.Context, in *UpdateUserNamesRequest, opts ...grpc.CallOption) (*UpdateUserNamesResponse, error)
+	GetUserAddress(ctx context.Context, in *GetUserAddressRequest, opts ...grpc.CallOption) (*GetUserAddressResponse, error)
 }
 
 type userServiceClient struct {
@@ -164,6 +165,15 @@ func (c *userServiceClient) UpdateUserVerificationNames(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *userServiceClient) GetUserAddress(ctx context.Context, in *GetUserAddressRequest, opts ...grpc.CallOption) (*GetUserAddressResponse, error) {
+	out := new(GetUserAddressResponse)
+	err := c.cc.Invoke(ctx, "/user.UserService/GetUserAddress", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServiceServer is the server API for UserService service.
 // All implementations should embed UnimplementedUserServiceServer
 // for forward compatibility
@@ -181,6 +191,7 @@ type UserServiceServer interface {
 	UpdateUserProfilePicture(context.Context, *UpdateProfilePictureRequest) (*model.User, error)
 	UpdateUserAddress(context.Context, *UpdateUserAddressRequest) (*model.Address, error)
 	UpdateUserVerificationNames(context.Context, *UpdateUserNamesRequest) (*UpdateUserNamesResponse, error)
+	GetUserAddress(context.Context, *GetUserAddressRequest) (*GetUserAddressResponse, error)
 }
 
 // UnimplementedUserServiceServer should be embedded to have forward compatible implementations.
@@ -225,6 +236,9 @@ func (UnimplementedUserServiceServer) UpdateUserAddress(context.Context, *Update
 }
 func (UnimplementedUserServiceServer) UpdateUserVerificationNames(context.Context, *UpdateUserNamesRequest) (*UpdateUserNamesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserVerificationNames not implemented")
+}
+func (UnimplementedUserServiceServer) GetUserAddress(context.Context, *GetUserAddressRequest) (*GetUserAddressResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserAddress not implemented")
 }
 
 // UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -472,6 +486,24 @@ func _UserService_UpdateUserVerificationNames_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserService_GetUserAddress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserAddressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServiceServer).GetUserAddress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserService/GetUserAddress",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServiceServer).GetUserAddress(ctx, req.(*GetUserAddressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -530,6 +562,10 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserVerificationNames",
 			Handler:    _UserService_UpdateUserVerificationNames_Handler,
+		},
+		{
+			MethodName: "GetUserAddress",
+			Handler:    _UserService_GetUserAddress_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

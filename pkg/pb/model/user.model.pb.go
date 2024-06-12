@@ -452,7 +452,7 @@ type User struct {
 	Bio                string                 `protobuf:"bytes,11,opt,name=Bio,json=bio,proto3" json:"Bio,omitempty"`
 	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=CreatedAt,json=created_at,proto3" json:"CreatedAt,omitempty"`
 	UpdatedAt          *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=UpdatedAt,json=updated_at,proto3" json:"UpdatedAt,omitempty"`
-	VerificationStatus VerificationStatus     `protobuf:"varint,14,opt,name=VerificationStatus,json=verificationstatus,proto3,enum=VerificationStatus" json:"VerificationStatus,omitempty"`
+	VerificationStatus VerificationStatus     `protobuf:"varint,14,opt,name=VerificationStatus,json=verificationstatus,proto3,enum=VerificationStatus" json:"VerificationStatus,omitempty"` //Address Address    = 15 [(gorm.field).belongs_to = {}];
 }
 
 func (x *User) Reset() {

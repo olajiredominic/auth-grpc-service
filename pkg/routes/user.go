@@ -653,7 +653,6 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 		address.Zip = req.Address.Zip
 		address.Country = req.Address.Country
 		address.Type = req.Address.Type
-		//address.UserId = &req.Address.User.Id
 
 		// Save the updated address
 		if err := h.DB.Save(&address).Error; err != nil {
@@ -716,6 +715,39 @@ func (h *Handler) UpdateUserVerificationNames(ctx context.Context, req *pb.Updat
 	// Create a response object and populate it with the necessary data
 	response := &pb.UpdateUserNamesResponse{
 		UserVerification: &updatedVerification, // Assuming pb.UpdateUserNamesResponse has a UserVerification field
+	}
+
+	return response, nil
+}
+
+func (h *Handler) GetUserAddress(ctx context.Context, req *pb.GetUserAddressRequest) (*pb.GetUserAddressResponse, error) {
+	var address models.AddressORM
+	query := h.DB.First(&address, "user_id = ?", req.UserId)
+
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// Address not found for the user
+			log.Println("Address not found for user ", req.UserId)
+			return nil, status.Errorf(codes.NotFound, "Address not found")
+		}
+		// Other errors during query execution
+		log.Println("Error fetching address for user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.Internal, "Error fetching address")
+	}
+
+	// Convert the ORM address to the protobuf Address model
+	addressPB := &models.Address{
+		Address: address.Address,
+		City:    address.City,
+		State:   address.State,
+		Zip:     address.Zip,
+		Country: address.Country,
+		Type:    address.Type,
+	}
+
+	// Create a response object and populate it with the address data
+	response := &pb.GetUserAddressResponse{
+		Address: addressPB,
 	}
 
 	return response, nil
