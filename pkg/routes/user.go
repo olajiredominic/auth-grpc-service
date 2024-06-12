@@ -296,6 +296,11 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 			IdType: 1,
 			UserId: existingUser.Id,
 		})
+		h.UpdateUserVerificationNames(ctx, &pb.UpdateUserNamesRequest{
+			FirstName: res.Applicant.Firstname,
+			LastName:  res.Applicant.Lastname,
+			UserId:    existingUser.Id,
+		})
 	case models.IdType_IDENTITY_CARD:
 		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
 			IdNumber:  string(req.IdNumber),
@@ -315,6 +320,11 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
 			IdType: 2,
 			UserId: existingUser.Id,
+		})
+		h.UpdateUserVerificationNames(ctx, &pb.UpdateUserNamesRequest{
+			FirstName: res.Applicant.Firstname,
+			LastName:  res.Applicant.Lastname,
+			UserId:    existingUser.Id,
 		})
 	default:
 		verificationErr = status.Errorf(codes.InvalidArgument, "Invalid ID type for verification")
