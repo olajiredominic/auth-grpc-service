@@ -100,7 +100,7 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 		ImageUrl           string
 		Username           string
 		Bio                string
-		VerificationStatus string
+		VerificationStatus models.VerificationStatus
 	}
 
 	var usersColumnsList []UserColumns
@@ -154,15 +154,15 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 	// Convert UserColumnsList to models.User objects
 	for _, userColumns := range usersColumnsList {
 		userData := &models.User{
-			Id:        userColumns.Id,
-			Email:     userColumns.Email,
-			Firstname: userColumns.Firstname,
-			Lastname:  userColumns.Lastname,
-			Role:      userColumns.Role,
-			ImageUrl:  userColumns.ImageUrl,
-			Username:  userColumns.Username,
-			Bio:       userColumns.Bio,
-			// VerificationStatus: models.VerificationStatus(userColumns.VerificationStatus),
+			Id:                 userColumns.Id,
+			Email:              userColumns.Email,
+			Firstname:          userColumns.Firstname,
+			Lastname:           userColumns.Lastname,
+			Role:               userColumns.Role,
+			ImageUrl:           userColumns.ImageUrl,
+			Username:           userColumns.Username,
+			Bio:                userColumns.Bio,
+			VerificationStatus: models.VerificationStatus(userColumns.VerificationStatus),
 		}
 
 		users = append(users, userData)
@@ -239,7 +239,16 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		log.Println("User not found for verification:", query.Error)
 		return nil, status.Errorf(codes.NotFound, "User not found for verification")
 	}
+	// Save the verification status as PROCESSING
+	existingUser.VerificationStatus = int32(models.VerificationStatus_PROCESSING)
+	updateQuery := h.DB.Save(&existingUser)
+	if updateQuery.Error != nil {
+		log.Println("Failed to update user verification status to PROCESSING:", updateQuery.Error)
+		return nil, status.Errorf(codes.Internal, "Failed to update user verification status to PROCESSING")
+	}
 
+	// Perform additional verification logic based on IdType
+	var verificationErr error
 	// Perform additional verification logic based on IdType
 	switch req.IdType {
 	case models.IdType_DRIVERS_LICENCE:
@@ -261,6 +270,11 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
 			IdType: 0,
 			UserId: existingUser.Id,
+		})
+		h.UpdateUserVerificationNames(ctx, &pb.UpdateUserNamesRequest{
+			FirstName: res.Applicant.Firstname,
+			LastName:  res.Applicant.Lastname,
+			UserId:    existingUser.Id,
 		})
 	case models.IdType_PASSPORT:
 		res, err := h.VerifyPassport(ctx, &pb.VerifyPassportRequest{
@@ -303,21 +317,30 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 			UserId: existingUser.Id,
 		})
 	default:
-		// Invalid IdType
-		return nil, status.Errorf(codes.InvalidArgument, "Invalid IdType")
+		verificationErr = status.Errorf(codes.InvalidArgument, "Invalid ID type for verification")
 	}
 
-	// Perform additional verification logic based on CountryCode
-	//...
+	// Check if verification failed
+	if verificationErr != nil {
+		log.Println("Verification failed:", verificationErr)
 
-	// Update user verification status in the database
-	// For example, you might set a field like IsVerified to true in the UserORM model
-	h.DB.Save(&req)
+		// Update status to FAILED
+		existingUser.VerificationStatus = int32(models.VerificationStatus_FAILED)
+		failedUpdateQuery := h.DB.Save(&existingUser)
+		if failedUpdateQuery.Error != nil {
+			log.Println("Failed to update user verification status to FAILED:", failedUpdateQuery.Error)
+			return nil, status.Errorf(codes.Internal, "Failed to update user verification status to FAILED")
+		}
+
+		return nil, verificationErr
+	}
+
+	// After successful verification, update the verification status to VERIFIED
 	existingUser.VerificationStatus = int32(models.VerificationStatus_VERIFIED)
-	updateQuery := h.DB.Save(&existingUser)
-	if updateQuery.Error != nil {
-		log.Println("Failed to update user verification status:", updateQuery.Error)
-		return nil, status.Errorf(codes.Internal, "Failed to update user verification status")
+	finalUpdateQuery := h.DB.Save(&existingUser)
+	if finalUpdateQuery.Error != nil {
+		log.Println("Failed to update user verification status to VERIFIED:", finalUpdateQuery.Error)
+		return nil, status.Errorf(codes.Internal, "Failed to update user verification status to VERIFIED")
 	}
 
 	return &emptypb.Empty{}, nil
@@ -602,7 +625,7 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 			Zip:     req.Address.Zip,
 			Country: req.Address.Country,
 			Type:    req.Address.Type,
-			UserId:  req.UserId,
+			UserId:  &req.UserId,
 		}
 
 		if err := h.DB.Create(&address).Error; err != nil {
@@ -620,6 +643,7 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 		address.Zip = req.Address.Zip
 		address.Country = req.Address.Country
 		address.Type = req.Address.Type
+		//address.UserId = &req.Address.User.Id
 
 		// Save the updated address
 		if err := h.DB.Save(&address).Error; err != nil {
@@ -629,7 +653,7 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 	}
 
 	// Convert the ORM address back to the protobuf Address model if needed
-	updatedAddress := &models.Address{
+	updatedAddress := &models.AddressORM{
 		Id:      address.Id,
 		Address: address.Address,
 		City:    address.City,
@@ -637,8 +661,52 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 		Zip:     address.Zip,
 		Country: address.Country,
 		Type:    address.Type,
-		UserId:  address.UserId,
+		UserId:  &req.UserId,
+	}
+	addresses, _ := updatedAddress.ToPB(ctx)
+	return &addresses, nil
+}
+
+func (h *Handler) UpdateUserVerificationNames(ctx context.Context, req *pb.UpdateUserNamesRequest) (*pb.UpdateUserNamesResponse, error) {
+	// Check if the user exists in UserVerificationORM
+	var verificationORM models.UserVerificationORM
+	query := h.DB.First(&verificationORM, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			// User does not exist in UserVerificationORM, create a new row
+			verificationORM.UserId = &req.UserId
+			verificationORM.FirstName = req.FirstName
+			verificationORM.LastName = req.LastName
+			if err := h.DB.Create(&verificationORM).Error; err != nil {
+				log.Println("Error creating user verification ", req.UserId, err)
+				return nil, status.Errorf(codes.Internal, "Database error")
+			}
+		} else {
+			log.Println("Error fetching user verification ", req.UserId, query.Error)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
+	} else {
+		// User exists in UserVerificationORM, update the necessary fields
+		if err := h.DB.Model(&verificationORM).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
+			FirstName: req.FirstName,
+			LastName:  req.LastName,
+		}).Error; err != nil {
+			log.Println("Error updating user verification ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
 	}
 
-	return updatedAddress, nil
+	// Convert the updated UserVerificationORM model back to a Pb model
+	updatedVerification, err := verificationORM.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserVerificationORM to UserVerification model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user names")
+	}
+
+	// Create a response object and populate it with the necessary data
+	response := &pb.UpdateUserNamesResponse{
+		UserVerification: &updatedVerification, // Assuming pb.UpdateUserNamesResponse has a UserVerification field
+	}
+
+	return response, nil
 }

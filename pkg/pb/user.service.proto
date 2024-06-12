@@ -35,6 +35,8 @@ service UserService {
 
     rpc UpdateUserAddress(UpdateUserAddressRequest) returns (Address);
 
+     rpc UpdateUserVerificationNames(UpdateUserNamesRequest) returns (UpdateUserNamesResponse);
+
 
 }
 
@@ -144,4 +146,14 @@ message VerifyUserRequest {
  string Firstname = 3;
  string Lastname = 4;
  IdType IdType = 5;
+}
+
+message UpdateUserNamesRequest {
+  string UserId = 1;
+  string FirstName = 2;
+  string LastName = 3;
+}
+
+message UpdateUserNamesResponse {
+  UserVerification UserVerification = 1;
 }

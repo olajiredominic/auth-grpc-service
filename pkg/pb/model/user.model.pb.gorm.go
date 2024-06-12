@@ -21,7 +21,8 @@ type AddressORM struct {
 	State     string
 	Type      string
 	UpdatedAt *time.Time
-	UserId    string
+	User      *UserORM `gorm:"foreignKey:UserId;references:Id"`
+	UserId    *string
 	Zip       string
 }
 
@@ -47,7 +48,13 @@ func (m *Address) ToORM(ctx context.Context) (AddressORM, error) {
 	to.Zip = m.Zip
 	to.Country = m.Country
 	to.Type = m.Type
-	to.UserId = m.UserId
+	if m.User != nil {
+		tempUser, err := m.User.ToORM(ctx)
+		if err != nil {
+			return to, err
+		}
+		to.User = &tempUser
+	}
 	if m.CreatedAt != nil {
 		t := m.CreatedAt.AsTime()
 		to.CreatedAt = &t
@@ -79,7 +86,13 @@ func (m *AddressORM) ToPB(ctx context.Context) (Address, error) {
 	to.Zip = m.Zip
 	to.Country = m.Country
 	to.Type = m.Type
-	to.UserId = m.UserId
+	if m.User != nil {
+		tempUser, err := m.User.ToPB(ctx)
+		if err != nil {
+			return to, err
+		}
+		to.User = &tempUser
+	}
 	if m.CreatedAt != nil {
 		to.CreatedAt = timestamppb.New(*m.CreatedAt)
 	}
@@ -710,6 +723,7 @@ func DefaultApplyFieldMaskAddress(ctx context.Context, patchee *Address, patcher
 		return nil, errors.NilArgumentError
 	}
 	var err error
+	var updatedUser bool
 	var updatedCreatedAt bool
 	var updatedUpdatedAt bool
 	for i, f := range updateMask.Paths {
@@ -741,8 +755,25 @@ func DefaultApplyFieldMaskAddress(ctx context.Context, patchee *Address, patcher
 			patchee.Type = patcher.Type
 			continue
 		}
-		if f == prefix+"UserId" {
-			patchee.UserId = patcher.UserId
+		if !updatedUser && strings.HasPrefix(f, prefix+"User.") {
+			updatedUser = true
+			if patcher.User == nil {
+				patchee.User = nil
+				continue
+			}
+			if patchee.User == nil {
+				patchee.User = &User{}
+			}
+			if o, err := DefaultApplyFieldMaskUser(ctx, patchee.User, patcher.User, &field_mask.FieldMask{Paths: updateMask.Paths[i:]}, prefix+"User.", db); err != nil {
+				return nil, err
+			} else {
+				patchee.User = o
+			}
+			continue
+		}
+		if f == prefix+"User" {
+			updatedUser = true
+			patchee.User = patcher.User
 			continue
 		}
 		if !updatedCreatedAt && strings.HasPrefix(f, prefix+"CreatedAt.") {
