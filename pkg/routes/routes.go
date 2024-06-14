@@ -45,7 +45,7 @@ func Init(url, clientID, secretKey, tokenURL, qoreidBaseURL, vninURL, ninURL, dl
 		log.Fatalln(err)
 	}
 
-	db.AutoMigrate(&models.UserORM{}, &models.AddressORM{}, &models.UserPermissionORM{})
+	db.AutoMigrate(&models.UserORM{}, &models.UserVerificationORM{}, &models.AddressORM{}, &models.UserPermissionORM{})
 
 	return Handler{
 		DB:                     db,
