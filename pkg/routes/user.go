@@ -82,6 +82,7 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 		ImageUrl:           user.ImageUrl,
 		Username:           user.Username,
 		Bio:                user.Bio,
+		Telephone:          user.Telephone,
 		VerificationStatus: models.VerificationStatus(user.VerificationStatus),
 		CreatedAt:          createdAt,
 		UpdatedAt:          updatedAt,
@@ -101,6 +102,7 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 		Username           string
 		Bio                string
 		VerificationStatus models.VerificationStatus
+		Telephone          string
 	}
 
 	var usersColumnsList []UserColumns
@@ -163,6 +165,7 @@ func (h *Handler) ListUsers(ctx context.Context, req *pb.ListUsersRequest) (*pb.
 			Username:           userColumns.Username,
 			Bio:                userColumns.Bio,
 			VerificationStatus: models.VerificationStatus(userColumns.VerificationStatus),
+			Telephone:          userColumns.Telephone,
 		}
 
 		users = append(users, userData)
