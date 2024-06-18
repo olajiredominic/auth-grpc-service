@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
@@ -628,17 +629,23 @@ func (h *Handler) UpdateUserProfilePicture(ctx context.Context, req *pb.UpdatePr
 func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddressRequest) (*models.Address, error) {
 	var address models.AddressORM
 	query := h.DB.First(&address, "user_id = ?", req.UserId)
-
+	now := time.Now()
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 		// If the address is not found, create a new address entry
 		address = models.AddressORM{
-			Address: req.Address.Address,
-			City:    req.Address.City,
-			State:   req.Address.State,
-			Zip:     req.Address.Zip,
-			Country: req.Address.Country,
-			Type:    req.Address.Type,
-			UserId:  &req.UserId,
+			Street:      req.Address.Street,
+			City:        req.Address.City,
+			State:       req.Address.State,
+			PostalCode:  req.Address.PostalCode,
+			Country:     req.Address.Country,
+			Latitude:    req.Address.Latitude,
+			Longitude:   req.Address.Longitude,
+			StateCode:   req.Address.StateCode,
+			CountryCode: req.Address.CountryCode,
+			Currency:    req.Address.Currency,
+			CreatedAt:   &now,
+			UpdatedAt:   &now,
+			UserId:      &req.UserId,
 		}
 
 		if err := h.DB.Create(&address).Error; err != nil {
@@ -650,12 +657,17 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 		return nil, status.Errorf(codes.Internal, "Error fetching address")
 	} else {
 		// If the address exists, update the address fields
-		address.Address = req.Address.Address
+		address.Street = req.Address.Street
 		address.City = req.Address.City
 		address.State = req.Address.State
-		address.Zip = req.Address.Zip
+		address.PostalCode = req.Address.PostalCode
 		address.Country = req.Address.Country
-		address.Type = req.Address.Type
+		address.Latitude = req.Address.Latitude
+		address.Longitude = req.Address.Longitude
+		address.StateCode = req.Address.StateCode
+		address.CountryCode = req.Address.CountryCode
+		address.Currency = req.Address.Currency
+		address.UpdatedAt = &now
 
 		// Save the updated address
 		if err := h.DB.Save(&address).Error; err != nil {
@@ -666,14 +678,20 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 
 	// Convert the ORM address back to the protobuf Address model if needed
 	updatedAddress := &models.AddressORM{
-		Id:      address.Id,
-		Address: address.Address,
-		City:    address.City,
-		State:   address.State,
-		Zip:     address.Zip,
-		Country: address.Country,
-		Type:    address.Type,
-		UserId:  &req.UserId,
+		Id:          address.Id,
+		Street:      address.Street,
+		City:        address.City,
+		State:       address.State,
+		PostalCode:  address.PostalCode,
+		Country:     address.Country,
+		Latitude:    address.Latitude,
+		Longitude:   address.Longitude,
+		StateCode:   address.StateCode,
+		CountryCode: address.CountryCode,
+		Currency:    address.Currency,
+		// CreatedAt:   timestamppb.New(*address.CreatedAt),
+		// UpdatedAt:   timestamppb.New(*address.UpdatedAt),
+		UserId: &req.UserId,
 	}
 	addresses, _ := updatedAddress.ToPB(ctx)
 	return &addresses, nil
@@ -740,12 +758,18 @@ func (h *Handler) GetUserAddress(ctx context.Context, req *pb.GetUserAddressRequ
 
 	// Convert the ORM address to the protobuf Address model
 	addressPB := &models.Address{
-		Address: address.Address,
-		City:    address.City,
-		State:   address.State,
-		Zip:     address.Zip,
-		Country: address.Country,
-		Type:    address.Type,
+		Street:      address.Street,
+		City:        address.City,
+		State:       address.State,
+		PostalCode:  address.PostalCode,
+		Country:     address.Country,
+		Latitude:    address.Latitude,
+		Longitude:   address.Longitude,
+		StateCode:   address.StateCode,
+		CountryCode: address.CountryCode,
+		Currency:    address.Currency,
+		CreatedAt:   timestamppb.New(*address.CreatedAt),
+		UpdatedAt:   timestamppb.New(*address.UpdatedAt),
 	}
 
 	// Create a response object and populate it with the address data
