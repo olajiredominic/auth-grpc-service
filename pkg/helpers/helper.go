@@ -14,9 +14,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lerryjay/auth-grpc-service/pkg/pb"
-
 	"github.com/lerryjay/auth-grpc-service/pkg/config"
+	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -158,18 +157,14 @@ func ValidateJWTToken(token string) (string, error) {
 	return data["user"], nil
 }
 
-func GetImageVerificationURL(idType pb.IdentityType) (string, error) {
+func GetImageVerificationURL(idType models.IdType) (string, error) {
 	switch idType {
-	case pb.IdentityType_NIN:
+	case models.IdType_IDENTITY_CARD:
 		return "nin", nil
-	case pb.IdentityType_VNIN:
-		return "vnin", nil
-	case pb.IdentityType_NIGERIAN_PASSPORT:
-		return "nigerian-passport", nil
-	case pb.IdentityType_BVN:
-		return "bvn", nil
-	case pb.IdentityType_DRIVERS_LICENSE:
+	case models.IdType_DRIVERS_LICENCE:
 		return "drivers-license", nil
+	case models.IdType_PASSPORT:
+		return "nigerian-passport", nil
 	default:
 		return "", fmt.Errorf("invalid identity type: %v", idType)
 	}

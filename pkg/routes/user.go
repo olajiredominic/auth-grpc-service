@@ -3,9 +3,7 @@ package routes
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log"
-	"strconv"
 	"time"
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
@@ -257,7 +255,7 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 	switch req.IdType {
 	case models.IdType_DRIVERS_LICENCE:
 		res, err := h.VerifyDL(ctx, &pb.VerifyDLRequest{
-			IdNumber:  string(req.IdNumber),
+			IdNumber:  req.IdNumber,
 			Firstname: req.Firstname,
 			Lastname:  req.Lastname,
 			// Other fields...
@@ -266,9 +264,10 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		if err != nil {
 			return nil, err
 		}
+
 		// Update the id_number of UserVerification instead of UserID
 		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
-			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			IdNumber: req.IdNumber,    // Assuming res.Id contains the verified ID number
 			UserId:   existingUser.Id, // Assuming UserORM has an ID field
 		})
 		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
@@ -282,7 +281,7 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		})
 	case models.IdType_PASSPORT:
 		res, err := h.VerifyPassport(ctx, &pb.VerifyPassportRequest{
-			IdNumber:  string(req.IdNumber),
+			IdNumber:  req.IdNumber,
 			Firstname: req.Firstname,
 			Lastname:  req.Lastname,
 			// Other fields...
@@ -293,7 +292,7 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		}
 		// Update the id_number of UserVerification
 		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
-			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			IdNumber: req.IdNumber,    // Assuming res.Id contains the verified ID number
 			UserId:   existingUser.Id, // Assuming UserORM has an ID field
 		})
 		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
@@ -307,18 +306,20 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 		})
 	case models.IdType_IDENTITY_CARD:
 		res, err := h.VerifyNIN(ctx, &pb.VerifyNINRequest{
-			IdNumber:  string(req.IdNumber),
+			IdNumber:  req.IdNumber,
 			Firstname: req.Firstname,
 			Lastname:  req.Lastname,
+
 			// Other fields...
 		})
 
 		if err != nil {
 			return nil, err
 		}
+
 		// Update the id_number of UserVerification
 		h.UpdateUserIDNumber(ctx, &pb.UpdateIDNumberRequest{
-			IdNumber: res.Id,          // Assuming res.Id contains the verified ID number
+			IdNumber: req.IdNumber,    // Assuming res.Id contains the verified ID number
 			UserId:   existingUser.Id, // Assuming UserORM has an ID field
 		})
 		h.UpdateUserIDType(ctx, &pb.UpdateIDTypeRequest{
@@ -422,17 +423,47 @@ func (h *Handler) UpdateUserIDImage(ctx context.Context, req *pb.UpdateIDImageRe
 
 func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequest) (*pb.UpdateSelfieResponse, error) {
 	// First, check if the user exists in UserORM
+	var Verification models.UserVerificationORM
+	query := h.DB.First(&Verification, "user_id = ?", req.UserId)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		log.Println("Error fetching user ", req.UserId, query.Error)
+		return nil, status.Errorf(codes.Internal, "Database error")
+	}
+
+	// Get the idnumber from the user record
+	idnumber := Verification.IdNumber
+	// Verify the selfie image
+	verifyReq := &pb.VerifyIdentityImageRequest{
+		//PhotoUrl:    req.SelfiePath,
+		PhotoBase64: req.PhotoBase64, // If you have a base64 string, provide it here
+		IdNumber:    idnumber,        // Assuming the ID type for the selfie
+	}
+	verifyResp, err := h.VerifyIDImage(ctx, verifyReq)
+	if err != nil {
+		log.Println("Selfie verification failed:", err)
+		return nil, status.Errorf(codes.InvalidArgument, "Selfie verification failed: %v", err)
+	}
+
+	// Check if the verification status is "verified"
+	if verifyResp.Status.Status != "verified" {
+		return nil, status.Errorf(codes.InvalidArgument, "Selfie verification failed")
+	}
+
+	// First, check if the user exists in UserORM
 	var user models.UserORM
-	query := h.DB.First(&user, "id = ?", req.UserId)
+	query = h.DB.First(&user, "id = ?", req.UserId)
 	if query.Error != nil {
 		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 			// User does not exist in UserORM, create a new row
-			user.Id = req.UserId
-			// Assuming other necessary fields are set here
-			if err := h.DB.Create(&user).Error; err != nil {
-				log.Println("Error creating user ", req.UserId, err)
-				return nil, status.Errorf(codes.Internal, "Database error")
-			}
+			// user.Id = req.UserId
+			// // Assuming other necessary fields are set here
+			// if err := h.DB.Create(&user).Error; err != nil {
+			// 	log.Println("Error creating user ", req.UserId, err)
+			// 	return nil, status.Errorf(codes.Internal, "Database error")
+			// }
 		} else {
 			log.Println("Error fetching user ", req.UserId, query.Error)
 			return nil, status.Errorf(codes.Internal, "Database error")
@@ -440,10 +471,11 @@ func (h *Handler) UpdateUserSelfie(ctx context.Context, req *pb.UpdateSelfieRequ
 	} else {
 		// User exists, update the user details if necessary
 		// Assuming user.IDImagePath or other fields might need updates
-		// if err := h.DB.Save(&user).Error; err != nil {
-		// 	log.Println("Error updating user ", req.UserId, err)
-		// 	return nil, status.Errorf(codes.Internal, "Database error")
-		// }
+		user.VerificationStatus = int32(models.VerificationStatus_VERIFIED)
+		if err := h.DB.Save(&user).Error; err != nil {
+			log.Println("Error updating user ", req.UserId, err)
+			return nil, status.Errorf(codes.Internal, "Database error")
+		}
 	}
 
 	// Next, check if the user exists in UserVerificationORM
@@ -527,7 +559,8 @@ func (h *Handler) UpdateUserIDNumber(ctx context.Context, req *pb.UpdateIDNumber
 		// User exists in UserVerificationORM, update the necessary fields
 		if err := h.DB.Model(&verificationORM).Where("user_id = ?", req.UserId).Updates(models.UserVerificationORM{
 			//IdNumber: strconv.Itoa(int(req.IdNumber)),
-			IdNumber: fmt.Sprintf("QOREID-%s", strconv.Itoa(int(req.IdNumber))),
+			IdNumber: req.IdNumber,
+			//IdNumber: req.IdNumber,
 		}).Error; err != nil {
 			log.Println("Error updating user verification ", req.UserId, err)
 			return nil, status.Errorf(codes.Internal, "Database error")

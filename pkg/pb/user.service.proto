@@ -95,7 +95,7 @@ message UpdateIDImageResponse {
 
 message UpdateIDNumberRequest {
  string UserId = 1; // The ID of the user.
- int32 IdNumber = 2; // The new ID number of the user.
+ string IdNumber = 2; // The new ID number of the user.
  string Firstname = 3;
  string Lastname = 4;
 }
@@ -109,6 +109,8 @@ message UpdateIDNumberResponse {
 message UpdateSelfieRequest {
  string UserId = 1; // The ID of the user.
  string SelfiePath = 2; // The path to the uploaded selfie.
+ string IdNumber = 3;
+ string PhotoBase64 = 4;
 }
 
 // The response message for updating a user's selfie.
