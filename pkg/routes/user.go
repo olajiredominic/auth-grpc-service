@@ -666,16 +666,16 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 	if errors.Is(query.Error, gorm.ErrRecordNotFound) {
 		// If the address is not found, create a new address entry
 		address = models.AddressORM{
-			Street:      req.Address.Street,
-			City:        req.Address.City,
-			State:       req.Address.State,
-			PostalCode:  req.Address.PostalCode,
-			Country:     req.Address.Country,
-			Latitude:    req.Address.Latitude,
-			Longitude:   req.Address.Longitude,
-			StateCode:   req.Address.StateCode,
-			CountryCode: req.Address.CountryCode,
-			Currency:    req.Address.Currency,
+			Street:      req.Street,
+			City:        req.City,
+			State:       req.State,
+			PostalCode:  req.PostalCode,
+			Country:     req.Country,
+			Latitude:    req.Latitude,
+			Longitude:   req.Longitude,
+			StateCode:   req.StateCode,
+			CountryCode: req.CountryCode,
+			Currency:    req.Currency,
 			CreatedAt:   &now,
 			UpdatedAt:   &now,
 			UserId:      &req.UserId,
@@ -690,16 +690,16 @@ func (h *Handler) UpdateUserAddress(ctx context.Context, req *pb.UpdateUserAddre
 		return nil, status.Errorf(codes.Internal, "Error fetching address")
 	} else {
 		// If the address exists, update the address fields
-		address.Street = req.Address.Street
-		address.City = req.Address.City
-		address.State = req.Address.State
-		address.PostalCode = req.Address.PostalCode
-		address.Country = req.Address.Country
-		address.Latitude = req.Address.Latitude
-		address.Longitude = req.Address.Longitude
-		address.StateCode = req.Address.StateCode
-		address.CountryCode = req.Address.CountryCode
-		address.Currency = req.Address.Currency
+		address.Street = req.Street
+		address.City = req.City
+		address.State = req.State
+		address.PostalCode = req.PostalCode
+		address.Country = req.Country
+		address.Latitude = req.Latitude
+		address.Longitude = req.Longitude
+		address.StateCode = req.StateCode
+		address.CountryCode = req.CountryCode
+		address.Currency = req.Currency
 		address.UpdatedAt = &now
 
 		// Save the updated address

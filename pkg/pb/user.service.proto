@@ -139,8 +139,19 @@ message UpdateProfilePictureResponse {
     google.protobuf.Timestamp UpdatedAt = 2;
 }
 message UpdateUserAddressRequest {
-  string UserId = 1;
-  Address Address = 2;
+  string UserId = 1;    
+string Street =2;    
+string City =3;      
+string State =4;     
+string Country  = 5;  
+string PostalCode = 6;
+string Latitude   = 7;
+string Longitude  = 8;
+string StateCode  = 9;
+string CountryCode =10;
+string Currency   = 11;
+google.protobuf.Timestamp CreatedAt  = 12;
+google.protobuf.Timestamp UpdatedAt  =13;
 }
 
 message VerifyUserRequest {
