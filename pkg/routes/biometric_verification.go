@@ -3,17 +3,33 @@ package routes
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
+	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
+	"gorm.io/gorm"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 func (h *Handler) VerifyIDImage(ctx context.Context, req *pb.VerifyIdentityImageRequest) (*pb.VerifyIdentityImageResponse, error) {
+	// First, check if the user exists in UserORM
+	var Verification models.UserVerificationORM
+	query := h.DB.First(&Verification, "id_number = ?", req.IdNumber)
+	if query.Error != nil {
+		if errors.Is(query.Error, gorm.ErrRecordNotFound) {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		log.Println("Error fetching user ", req.IdNumber, query.Error)
+		return nil, status.Errorf(codes.Internal, "Database error")
+	}
+	IdType := models.IdType(Verification.IdType)
+	req.IdType = IdType
 	// Call the Login function to get the bearer token
 	token, err := h.Login(ctx, &pb.LoginRequest{
 		ClientId:  h.ClientID,
@@ -37,7 +53,7 @@ func (h *Handler) VerifyIDImage(ctx context.Context, req *pb.VerifyIdentityImage
 
 	// Create the payload for NIN image verification
 	payload := map[string]string{
-		"photoUrl":    req.PhotoUrl,
+		"idNumber":    req.IdNumber,
 		"photoBase64": req.PhotoBase64,
 	}
 
