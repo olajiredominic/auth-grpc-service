@@ -3,9 +3,9 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "pkg/pb/model";
+//option go_package = "pkg/pb/model";
 
-//option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
+option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 
 enum Status {
