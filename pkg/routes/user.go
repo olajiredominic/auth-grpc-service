@@ -351,7 +351,7 @@ func (h *Handler) VerifyUser(ctx context.Context, req *pb.VerifyUserRequest) (*e
 	}
 
 	// After successful verification, update the verification status to VERIFIED
-	existingUser.VerificationStatus = int32(models.VerificationStatus_VERIFIED)
+	existingUser.VerificationStatus = int32(models.VerificationStatus_PARTIAL)
 	finalUpdateQuery := h.DB.Save(&existingUser)
 	if finalUpdateQuery.Error != nil {
 		log.Println("Failed to update user verification status to VERIFIED:", finalUpdateQuery.Error)
