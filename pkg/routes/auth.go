@@ -13,6 +13,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*emptypb.Empty, error) {
@@ -343,4 +344,26 @@ func findPermissionChanges(oldList, newList []string) ([]string, []string) {
 	}
 
 	return added, removed
+}
+
+func (h *Handler) CheckUserPasswordStatus(ctx context.Context, req *pb.CheckUserPasswordStatusRequest) (*pb.CheckUserPasswordStatusResponse, error) {
+	var user models.UserORM
+
+	query := h.DB.First(&user, "id = ?", req.Id)
+	if query.Error != nil {
+		if query.Error == gorm.ErrRecordNotFound {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		return nil, status.Errorf(codes.Internal, "Error fetching user: %v", query.Error)
+	}
+
+	hasPassword := user.Password != ""
+	enable2FA := user.Enable2FA // Assuming Enable2FA is a boolean field in UserORM
+
+	response := &pb.CheckUserPasswordStatusResponse{
+		HasPassword: hasPassword,
+		Enable2FA:   enable2FA,
+	}
+
+	return response, nil
 }

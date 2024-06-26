@@ -38,7 +38,6 @@ service UserService {
      rpc UpdateUserVerificationNames(UpdateUserNamesRequest) returns (UpdateUserNamesResponse);
 
   rpc GetUserAddress(GetUserAddressRequest) returns (GetUserAddressResponse);
-  rpc CheckUserPasswordStatus(GetUserRequest) returns (CheckUserPasswordStatusResponse);
 
 }
 
@@ -181,7 +180,3 @@ message GetUserAddressResponse {
   Address Address = 1;
 }
 
-message CheckUserPasswordStatusResponse {
-  bool HasPassword = 1;
-  bool Enable2FA = 2;
-}
