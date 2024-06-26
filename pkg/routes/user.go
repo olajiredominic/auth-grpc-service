@@ -814,14 +814,19 @@ func (h *Handler) GetUserAddress(ctx context.Context, req *pb.GetUserAddressRequ
 	return response, nil
 }
 
-func (h *Handler) CheckUserPasswordStatus(ctx context.Context, req *pb.GetUserRequest) (bool, bool, error) {
+func (h *Handler) CheckUserPasswordStatus(ctx context.Context, req *pb.GetUserRequest) (*pb.CheckUserPasswordStatusResponse, error) {
 	user, err := h.GetUser(ctx, req)
 	if err != nil {
-		return false, false, err
+		return nil, err
 	}
 
 	hasPassword := user.Password != ""
 	enable2FA := user.Enable2FA
 
-	return hasPassword, enable2FA, nil
+	response := &pb.CheckUserPasswordStatusResponse{
+		HasPassword: hasPassword,
+		Enable2FA:   enable2FA,
+	}
+
+	return response, nil
 }
