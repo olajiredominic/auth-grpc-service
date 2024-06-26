@@ -120,6 +120,7 @@ type UserORM struct {
 	Bio                string
 	CreatedAt          *time.Time
 	Email              string
+	Enable2FA          bool
 	Firstname          string
 	Id                 string `gorm:"type:uuid;primaryKey"`
 	ImageUrl           string
@@ -168,6 +169,7 @@ func (m *User) ToORM(ctx context.Context) (UserORM, error) {
 		to.UpdatedAt = &t
 	}
 	to.VerificationStatus = int32(m.VerificationStatus)
+	to.Enable2FA = m.Enable2FA
 	if posthook, ok := interface{}(m).(UserWithAfterToORM); ok {
 		err = posthook.AfterToORM(ctx, &to)
 	}
@@ -202,6 +204,7 @@ func (m *UserORM) ToPB(ctx context.Context) (User, error) {
 		to.UpdatedAt = timestamppb.New(*m.UpdatedAt)
 	}
 	to.VerificationStatus = VerificationStatus(m.VerificationStatus)
+	to.Enable2FA = m.Enable2FA
 	if posthook, ok := interface{}(m).(UserWithAfterToPB); ok {
 		err = posthook.AfterToPB(ctx, &to)
 	}
@@ -1245,6 +1248,10 @@ func DefaultApplyFieldMaskUser(ctx context.Context, patchee *User, patcher *User
 		}
 		if f == prefix+"VerificationStatus" {
 			patchee.VerificationStatus = patcher.VerificationStatus
+			continue
+		}
+		if f == prefix+"Enable2FA" {
+			patchee.Enable2FA = patcher.Enable2FA
 			continue
 		}
 	}

@@ -40,6 +40,7 @@ message User {
     google.protobuf.Timestamp  CreatedAt  = 12 [json_name="created_at"];
     google.protobuf.Timestamp  UpdatedAt  = 13 [json_name="updated_at"];
     VerificationStatus VerificationStatus  = 14 [json_name="verificationstatus"];
+    bool Enable2FA = 15;
     //Address Address    = 15 [(gorm.field).belongs_to = {}];
 }
 // Enum for identity types
