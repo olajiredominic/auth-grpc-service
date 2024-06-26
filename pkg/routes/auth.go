@@ -17,33 +17,38 @@ import (
 )
 
 func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*emptypb.Empty, error) {
-
 	var user models.UserORM
 
+	// Fetch the user from the database
 	query := h.DB.First(&user, "id = ?", req.Id)
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.InvalidArgument,
-			"Invalid user or user not found or has been removed!")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user or user not found or has been removed!")
 	}
 
-	if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
-		return nil, status.Errorf(codes.InvalidArgument,
-			"Old password incorrect")
+	// If the user has a password, validate the old password
+	if user.Password != "" {
+		if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
+			return nil, status.Errorf(codes.InvalidArgument, "Old password incorrect")
+		}
+	} else {
+		// If the user doesn't have a password, old password should not be provided
+		if req.Oldpassword != "" {
+			return nil, status.Errorf(codes.InvalidArgument, "Old password should not be provided for users without an existing password")
+		}
 	}
 
+	// Hash the new password
 	password, err := helpers.HashPassword(req.Newpassword)
 	if err != nil {
 		log.Println(err)
-		return nil, status.Errorf(codes.Internal,
-			"An unexpected error occured")
+		return nil, status.Errorf(codes.Internal, "An unexpected error occurred")
 	}
 
+	// Update the user's password in the database
 	result := h.DB.Model(&user).Where("id = ?", req.GetId()).Update("Password", password)
-	// Append to the Books table
 	if result.Error != nil {
-		return nil, status.Errorf(codes.Internal,
-			"An unexpected error occured")
+		return nil, status.Errorf(codes.Internal, "An unexpected error occurred")
 	}
 
 	return &emptypb.Empty{}, nil
