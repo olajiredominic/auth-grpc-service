@@ -31,11 +31,6 @@ func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequ
 		if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
 			return nil, status.Errorf(codes.InvalidArgument, "Old password incorrect")
 		}
-	} else {
-		// If the user doesn't have a password, old password should not be provided
-		if req.Oldpassword != "" {
-			return nil, status.Errorf(codes.InvalidArgument, "Old password should not be provided for users without an existing password")
-		}
 	}
 
 	// Hash the new password
