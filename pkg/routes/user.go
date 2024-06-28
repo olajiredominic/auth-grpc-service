@@ -85,6 +85,7 @@ func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.
 		VerificationStatus: models.VerificationStatus(user.VerificationStatus),
 		CreatedAt:          createdAt,
 		UpdatedAt:          updatedAt,
+		Enable2FA:          user.Enable2FA,
 	}
 	return userData, nil
 }

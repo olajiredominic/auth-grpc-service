@@ -117,9 +117,12 @@ type UserPermissionWithAfterToPB interface {
 }
 
 type UserORM struct {
+	Address            *AddressORM `gorm:"foreignKey:AddressId;references:Id"`
+	AddressId          *int32
 	Bio                string
 	CreatedAt          *time.Time
 	Email              string
+	Enable2FA          bool
 	Firstname          string
 	Id                 string `gorm:"type:uuid;primaryKey"`
 	ImageUrl           string
@@ -168,6 +171,14 @@ func (m *User) ToORM(ctx context.Context) (UserORM, error) {
 		to.UpdatedAt = &t
 	}
 	to.VerificationStatus = int32(m.VerificationStatus)
+	if m.Address != nil {
+		tempAddress, err := m.Address.ToORM(ctx)
+		if err != nil {
+			return to, err
+		}
+		to.Address = &tempAddress
+	}
+	to.Enable2FA = m.Enable2FA
 	if posthook, ok := interface{}(m).(UserWithAfterToORM); ok {
 		err = posthook.AfterToORM(ctx, &to)
 	}
@@ -202,6 +213,14 @@ func (m *UserORM) ToPB(ctx context.Context) (User, error) {
 		to.UpdatedAt = timestamppb.New(*m.UpdatedAt)
 	}
 	to.VerificationStatus = VerificationStatus(m.VerificationStatus)
+	if m.Address != nil {
+		tempAddress, err := m.Address.ToPB(ctx)
+		if err != nil {
+			return to, err
+		}
+		to.Address = &tempAddress
+	}
+	to.Enable2FA = m.Enable2FA
 	if posthook, ok := interface{}(m).(UserWithAfterToPB); ok {
 		err = posthook.AfterToPB(ctx, &to)
 	}
@@ -1152,6 +1171,7 @@ func DefaultApplyFieldMaskUser(ctx context.Context, patchee *User, patcher *User
 	var err error
 	var updatedCreatedAt bool
 	var updatedUpdatedAt bool
+	var updatedAddress bool
 	for i, f := range updateMask.Paths {
 		if f == prefix+"Id" {
 			patchee.Id = patcher.Id
@@ -1245,6 +1265,31 @@ func DefaultApplyFieldMaskUser(ctx context.Context, patchee *User, patcher *User
 		}
 		if f == prefix+"VerificationStatus" {
 			patchee.VerificationStatus = patcher.VerificationStatus
+			continue
+		}
+		if !updatedAddress && strings.HasPrefix(f, prefix+"Address.") {
+			updatedAddress = true
+			if patcher.Address == nil {
+				patchee.Address = nil
+				continue
+			}
+			if patchee.Address == nil {
+				patchee.Address = &Address{}
+			}
+			if o, err := DefaultApplyFieldMaskAddress(ctx, patchee.Address, patcher.Address, &field_mask.FieldMask{Paths: updateMask.Paths[i:]}, prefix+"Address.", db); err != nil {
+				return nil, err
+			} else {
+				patchee.Address = o
+			}
+			continue
+		}
+		if f == prefix+"Address" {
+			updatedAddress = true
+			patchee.Address = patcher.Address
+			continue
+		}
+		if f == prefix+"Enable2FA" {
+			patchee.Enable2FA = patcher.Enable2FA
 			continue
 		}
 	}

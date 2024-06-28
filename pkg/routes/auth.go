@@ -13,36 +13,37 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"gorm.io/gorm"
 )
 
 func (h *Handler) ChangePassword(ctx context.Context, req *pb.ChangePasswordRequest) (*emptypb.Empty, error) {
-
 	var user models.UserORM
 
+	// Fetch the user from the database
 	query := h.DB.First(&user, "id = ?", req.Id)
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.InvalidArgument,
-			"Invalid user or user not found or has been removed!")
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid user or user not found or has been removed!")
 	}
 
-	if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
-		return nil, status.Errorf(codes.InvalidArgument,
-			"Old password incorrect")
+	// If the user has a password, validate the old password
+	if user.Password != "" {
+		if valid := helpers.ValidatePasswordHash(user.Password, req.Oldpassword); !valid {
+			return nil, status.Errorf(codes.InvalidArgument, "Old password incorrect")
+		}
 	}
 
+	// Hash the new password
 	password, err := helpers.HashPassword(req.Newpassword)
 	if err != nil {
 		log.Println(err)
-		return nil, status.Errorf(codes.Internal,
-			"An unexpected error occured")
+		return nil, status.Errorf(codes.Internal, "An unexpected error occurred")
 	}
 
+	// Update the user's password in the database
 	result := h.DB.Model(&user).Where("id = ?", req.GetId()).Update("Password", password)
-	// Append to the Books table
 	if result.Error != nil {
-		return nil, status.Errorf(codes.Internal,
-			"An unexpected error occured")
+		return nil, status.Errorf(codes.Internal, "An unexpected error occurred")
 	}
 
 	return &emptypb.Empty{}, nil
@@ -343,4 +344,26 @@ func findPermissionChanges(oldList, newList []string) ([]string, []string) {
 	}
 
 	return added, removed
+}
+
+func (h *Handler) CheckUserPasswordStatus(ctx context.Context, req *pb.CheckUserPasswordStatusRequest) (*pb.CheckUserPasswordStatusResponse, error) {
+	var user models.UserORM
+
+	query := h.DB.First(&user, "id = ?", req.Id)
+	if query.Error != nil {
+		if query.Error == gorm.ErrRecordNotFound {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		return nil, status.Errorf(codes.Internal, "Error fetching user: %v", query.Error)
+	}
+
+	hasPassword := user.Password != ""
+	enable2FA := user.Enable2FA // Assuming Enable2FA is a boolean field in UserORM
+
+	response := &pb.CheckUserPasswordStatusResponse{
+		HasPassword: hasPassword,
+		Enable2FA:   enable2FA,
+	}
+
+	return response, nil
 }

@@ -35,6 +35,7 @@ type AuthServiceClient interface {
 	AddUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*model.UserPermission, error)
 	DeleteUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateUserPermissions(ctx context.Context, in *UpdateUserPermissionsRequest, opts ...grpc.CallOption) (*UpdateUserPermissionsResponse, error)
+	CheckUserPasswordStatus(ctx context.Context, in *CheckUserPasswordStatusRequest, opts ...grpc.CallOption) (*CheckUserPasswordStatusResponse, error)
 }
 
 type authServiceClient struct {
@@ -144,6 +145,15 @@ func (c *authServiceClient) UpdateUserPermissions(ctx context.Context, in *Updat
 	return out, nil
 }
 
+func (c *authServiceClient) CheckUserPasswordStatus(ctx context.Context, in *CheckUserPasswordStatusRequest, opts ...grpc.CallOption) (*CheckUserPasswordStatusResponse, error) {
+	out := new(CheckUserPasswordStatusResponse)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/CheckUserPasswordStatus", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuthServiceServer is the server API for AuthService service.
 // All implementations should embed UnimplementedAuthServiceServer
 // for forward compatibility
@@ -159,6 +169,7 @@ type AuthServiceServer interface {
 	AddUserPermission(context.Context, *model.UserPermission) (*model.UserPermission, error)
 	DeleteUserPermission(context.Context, *model.UserPermission) (*emptypb.Empty, error)
 	UpdateUserPermissions(context.Context, *UpdateUserPermissionsRequest) (*UpdateUserPermissionsResponse, error)
+	CheckUserPasswordStatus(context.Context, *CheckUserPasswordStatusRequest) (*CheckUserPasswordStatusResponse, error)
 }
 
 // UnimplementedAuthServiceServer should be embedded to have forward compatible implementations.
@@ -197,6 +208,9 @@ func (UnimplementedAuthServiceServer) DeleteUserPermission(context.Context, *mod
 }
 func (UnimplementedAuthServiceServer) UpdateUserPermissions(context.Context, *UpdateUserPermissionsRequest) (*UpdateUserPermissionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateUserPermissions not implemented")
+}
+func (UnimplementedAuthServiceServer) CheckUserPasswordStatus(context.Context, *CheckUserPasswordStatusRequest) (*CheckUserPasswordStatusResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CheckUserPasswordStatus not implemented")
 }
 
 // UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
@@ -408,6 +422,24 @@ func _AuthService_UpdateUserPermissions_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_CheckUserPasswordStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CheckUserPasswordStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).CheckUserPasswordStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/CheckUserPasswordStatus",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).CheckUserPasswordStatus(ctx, req.(*CheckUserPasswordStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -458,6 +490,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateUserPermissions",
 			Handler:    _AuthService_UpdateUserPermissions_Handler,
+		},
+		{
+			MethodName: "CheckUserPasswordStatus",
+			Handler:    _AuthService_CheckUserPasswordStatus_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
