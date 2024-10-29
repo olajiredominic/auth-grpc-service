@@ -3,9 +3,9 @@ syntax = "proto3";
 import "google/protobuf/timestamp.proto";
 import "pkg/pb/model/gorm.proto";
 
-option go_package = "pkg/pb/model";
+//option go_package = "pkg/pb/model";
 
-//option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
+option go_package = "github.com/lerryjay/auth-grpc-service/pkg/pb/model";
 
 
 enum Status {
@@ -102,4 +102,23 @@ message Address {
   User User    = 12 [(gorm.field).belongs_to = {}];
   google.protobuf.Timestamp  CreatedAt  = 13;
   google.protobuf.Timestamp  UpdatedAt  = 14;
+}
+
+   message Data {
+    int64 Pending = 1;
+    int64 Processing = 2;
+    int64 Verified = 3;
+    int64 Failed = 4;
+    int64 Partial = 5;
+    int64 Total = 6;
+}
+enum StaticticsType {
+  DAY = 0;
+  WEEK = 1;
+  MONTH = 2;
+}
+
+message DayStats {
+    string Date = 1;
+    Data Data = 2;
 }
