@@ -39,6 +39,9 @@ service UserService {
 
   rpc GetUserAddress(GetUserAddressRequest) returns (GetUserAddressResponse);
 
+    rpc GetUserStats(StatsRequest) returns (StatsResponse) { }
+
+
 }
 
 message ListUsersRequest {
@@ -180,3 +183,17 @@ message GetUserAddressResponse {
   Address Address = 1;
 }
 
+// Request message for fetching booking statistics
+message StatsRequest {
+    string EndDate = 1;   // Start date in the format "YYYY-MM-DD"
+    string StartDate = 2;     // End date in the format "YYYY-MM-DD"
+    StaticticsType Type = 3;   // Type of stats: "day" or "week"
+        bool SearchType = 4;
+
+}
+
+// Response message containing the statistics
+message StatsResponse {
+    int64 TotalUsers = 1; // Total number of bookings
+    repeated DayStats DayStats = 3; // Stats per day
+}

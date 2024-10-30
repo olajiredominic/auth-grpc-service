@@ -3,6 +3,7 @@ package routes
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
 	"time"
 
@@ -812,4 +813,133 @@ func (h *Handler) GetUserAddress(ctx context.Context, req *pb.GetUserAddressRequ
 	}
 
 	return response, nil
+}
+
+func (h *Handler) GetUserStats(ctx context.Context, req *pb.StatsRequest) (*pb.StatsResponse, error) {
+	// Parse StartDate and EndDate
+	startDate, err := time.Parse("2006-01-02", req.StartDate)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid start date format: %v", err)
+	}
+	endDate, err := time.Parse("2006-01-02", req.EndDate)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid end date format: %v", err)
+	}
+
+	// Determine grouping format based on Type
+	var groupBy string
+	switch req.Type {
+	case models.StaticticsType_DAY:
+		groupBy = "DATE(created_at)"
+	case models.StaticticsType_WEEK:
+		groupBy = "DATE_TRUNC('week', created_at)"
+	case models.StaticticsType_MONTH:
+		groupBy = "DATE_TRUNC('month', created_at)"
+	default:
+		return nil, status.Errorf(codes.InvalidArgument, "Invalid statistics type")
+	}
+
+	// Query with dynamic grouping
+	query := fmt.Sprintf(`
+		SELECT 
+			%s AS date,
+			verification_status,
+			COUNT(*) AS count
+		FROM "public"."users"
+		WHERE created_at BETWEEN ? AND ?
+		GROUP BY %s, verification_status
+		ORDER BY date ASC
+	`, groupBy, groupBy)
+
+	// Execute query
+	rows, err := h.DB.Raw(query, startDate, endDate).Rows()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "Error executing query: %v", err)
+	}
+	defer rows.Close()
+
+	// Map to hold data by date to avoid duplicate dates
+	statsByDate := make(map[string]*models.DayStats)
+	totalUsers := int64(0)
+
+	for rows.Next() {
+		var date time.Time
+		var verificationStatus *int32
+		var count int64
+
+		if err := rows.Scan(&date, &verificationStatus, &count); err != nil {
+			return nil, status.Errorf(codes.Internal, "Error scanning row: %v", err)
+		}
+
+		dateStr := date.Format("2006-01-02")
+
+		// Check if this date already exists in the map
+		dayStat, exists := statsByDate[dateStr]
+		if !exists {
+			// Initialize a new DayStats entry if not present
+			dayStat = &models.DayStats{
+				Date: dateStr,
+				Data: &models.Data{
+					Pending:    0,
+					Processing: 0,
+					Verified:   0,
+					Failed:     0,
+					Partial:    0,
+					Total:      0,
+				},
+			}
+			statsByDate[dateStr] = dayStat
+		}
+
+		// Increment counts based on verificationStatus
+		if verificationStatus != nil {
+			switch models.VerificationStatus(*verificationStatus) {
+			case models.VerificationStatus_PENDING:
+				dayStat.Data.Pending += count
+			case models.VerificationStatus_PROCESSING:
+				dayStat.Data.Processing += count
+			case models.VerificationStatus_VERIFIED:
+				dayStat.Data.Verified += count
+			case models.VerificationStatus_FAILED:
+				dayStat.Data.Failed += count
+			case models.VerificationStatus_PARTIAL:
+				dayStat.Data.Partial += count
+			}
+		}
+		// Update total for this date
+		dayStat.Data.Total += count
+		totalUsers += count
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, status.Errorf(codes.Internal, "Rows error: %v", err)
+	}
+
+	// Convert map to slice for consistent response
+	dayStats := make([]*models.DayStats, 0, len(statsByDate))
+	for _, stat := range statsByDate {
+		dayStats = append(dayStats, stat)
+	}
+
+	return &pb.StatsResponse{
+		TotalUsers: totalUsers,
+		DayStats:   dayStats,
+	}, nil
+}
+
+func initStatusMap() map[string]int64 {
+	return map[string]int64{
+		"PENDING":    0,
+		"PROCESSING": 0,
+		"VERIFIED":   0,
+		"FAILED":     0,
+		"PARTIAL":    0,
+	}
+}
+func sumStatusCounts(statusCounts map[string]int64) int64 {
+	total := int64(0)
+	for _, count := range statusCounts {
+		total += count
+	}
+	return total
 }
