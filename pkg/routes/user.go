@@ -9,6 +9,7 @@ import (
 
 	"github.com/lerryjay/auth-grpc-service/pkg/helpers"
 	"github.com/lerryjay/auth-grpc-service/pkg/pb"
+	"github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 	models "github.com/lerryjay/auth-grpc-service/pkg/pb/model"
 
 	"gorm.io/gorm"
@@ -942,4 +943,27 @@ func sumStatusCounts(statusCounts map[string]int64) int64 {
 		total += count
 	}
 	return total
+}
+
+func (h *Handler) UpdateUserHostingStatus(ctx context.Context, req *model.User) (*model.User, error) {
+	// First, check if the user exists in UserORM
+	var user models.UserORM
+	query := h.DB.First(&user, "id = ?", req.Id)
+	if query.Error != nil {
+		return nil, query.Error
+	}
+	user.Hosting = req.Hosting
+
+	updateQuery := h.DB.Save(&user)
+	if updateQuery.Error != nil {
+		log.Println("Failed to update user verification status:", updateQuery.Error)
+		return nil, status.Errorf(codes.Internal, "Failed to update user verification status")
+	}
+
+	updatedUser, err := user.ToPB(ctx)
+	if err != nil {
+		log.Println("Unable to convert UserORM to User model", err)
+		return nil, status.Errorf(codes.Internal, "Unable to update user ID type")
+	}
+	return &updatedUser, nil
 }

@@ -40,6 +40,7 @@ service UserService {
   rpc GetUserAddress(GetUserAddressRequest) returns (GetUserAddressResponse);
 
     rpc GetUserStats(StatsRequest) returns (StatsResponse) { }
+    rpc UpdateUserHostingStatus(User) returns (User);
 
 
 }
@@ -197,3 +198,8 @@ message StatsResponse {
     int64 TotalUsers = 1; // Total number of bookings
     repeated DayStats DayStats = 3; // Stats per day
 }
+message UpdateHostingStatusRequest {
+  User User = 1; // The ID of the user.
+  bool Hosting = 4;
+ }
+ 
