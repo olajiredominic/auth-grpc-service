@@ -35,6 +35,8 @@ service UserService {
 
     rpc UpdateUserAddress(UpdateUserAddressRequest) returns (Address);
 
+    rpc UpdateUserHostingStatus(User) returns (User);
+
 
 }
 
@@ -145,3 +147,9 @@ message VerifyUserRequest {
  string Lastname = 4;
  IdType IdType = 5;
 }
+
+message UpdateHostingStatusRequest {
+  User User = 1; // The ID of the user.
+  bool Hosting = 4;
+ }
+ 
