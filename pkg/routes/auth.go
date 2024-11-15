@@ -112,11 +112,11 @@ func (h *Handler) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*emp
 func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionRequest) (*emptypb.Empty, error) {
 
 	var userPermission models.UserPermissionORM
-	query := h.DB.First(&userPermission, "permission = ? AND user_id = ? AND status", req.Permission, req.Id, int32(models.Status_ACTIVE))
+	query := h.DB.First(&userPermission, "permission = ? AND user_id = ? AND status = ?", req.Permission, req.Id, int32(models.Status_ACTIVE))
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.Unauthenticated,
-			"Invalid username or password")
+			"UnAuthorized")
 	}
 
 	return &emptypb.Empty{}, nil
@@ -229,6 +229,33 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 	return &emptypb.Empty{}, nil
 }
 
+func (h *Handler) ListUserPermissions(ctx context.Context, req *pb.ListUserPermissionRequest) (*pb.ListUserPermissionsResponse, error) {
+
+	var permissions []string
+	var permissionsList []models.UserPermissionORM
+
+	query := h.DB.Model(&models.UserPermissionORM{})
+
+	if req.UserId != "" {
+		query = query.Where("user_id = ?  AND status = ?", &req.UserId, int32(models.Status_ACTIVE))
+	}
+	query = query.Select("permission").Find(&permissionsList)
+	if query.Error != nil && query.Error.Error() != "record not found" {
+		log.Println(query.Error)
+		return nil, status.Errorf(codes.FailedPrecondition,
+			"User already has permission")
+	}
+
+	// Convert UserColumnsList to models.User objects
+	for _, userColumns := range permissionsList {
+		permissions = append(permissions, userColumns.Permission)
+	}
+
+	return &pb.ListUserPermissionsResponse{
+		Permissions: permissions,
+	}, nil
+}
+
 func (h *Handler) AddUserPermission(ctx context.Context, req *models.UserPermission) (*models.UserPermission, error) {
 
 	var role models.UserPermissionORM
@@ -256,7 +283,7 @@ func (h *Handler) AddUserPermission(ctx context.Context, req *models.UserPermiss
 func (h *Handler) DeleteUserPermission(ctx context.Context, req *models.UserPermission) (*emptypb.Empty, error) {
 
 	var role models.UserPermissionORM
-	query := h.DB.First(&role, "userid = ? AND permission = ? AND status", req.User.Id, req.Permission, int32(models.Status_ACTIVE))
+	query := h.DB.First(&role, "user_id = ? AND permission = ? AND status = ?", req.User.Id, req.Permission, int32(models.Status_ACTIVE))
 	if query.Error != nil {
 		log.Println(query.Error)
 		return nil, status.Errorf(codes.FailedPrecondition,

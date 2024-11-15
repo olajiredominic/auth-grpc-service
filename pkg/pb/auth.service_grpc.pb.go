@@ -32,6 +32,7 @@ type AuthServiceClient interface {
 	ValidateToken(ctx context.Context, in *ValidateTokenRequest, opts ...grpc.CallOption) (*ValidateTokenResponse, error)
 	VerifyOTP(ctx context.Context, in *VerifyOTPRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	HasPermission(ctx context.Context, in *HasPermissionRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	ListUserPermissions(ctx context.Context, in *ListUserPermissionRequest, opts ...grpc.CallOption) (*ListUserPermissionsResponse, error)
 	AddUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*model.UserPermission, error)
 	DeleteUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateUserPermissions(ctx context.Context, in *UpdateUserPermissionsRequest, opts ...grpc.CallOption) (*UpdateUserPermissionsResponse, error)
@@ -118,6 +119,15 @@ func (c *authServiceClient) HasPermission(ctx context.Context, in *HasPermission
 	return out, nil
 }
 
+func (c *authServiceClient) ListUserPermissions(ctx context.Context, in *ListUserPermissionRequest, opts ...grpc.CallOption) (*ListUserPermissionsResponse, error) {
+	out := new(ListUserPermissionsResponse)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/ListUserPermissions", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authServiceClient) AddUserPermission(ctx context.Context, in *model.UserPermission, opts ...grpc.CallOption) (*model.UserPermission, error) {
 	out := new(model.UserPermission)
 	err := c.cc.Invoke(ctx, "/auth.AuthService/AddUserPermission", in, out, opts...)
@@ -166,6 +176,7 @@ type AuthServiceServer interface {
 	ValidateToken(context.Context, *ValidateTokenRequest) (*ValidateTokenResponse, error)
 	VerifyOTP(context.Context, *VerifyOTPRequest) (*emptypb.Empty, error)
 	HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error)
+	ListUserPermissions(context.Context, *ListUserPermissionRequest) (*ListUserPermissionsResponse, error)
 	AddUserPermission(context.Context, *model.UserPermission) (*model.UserPermission, error)
 	DeleteUserPermission(context.Context, *model.UserPermission) (*emptypb.Empty, error)
 	UpdateUserPermissions(context.Context, *UpdateUserPermissionsRequest) (*UpdateUserPermissionsResponse, error)
@@ -199,6 +210,9 @@ func (UnimplementedAuthServiceServer) VerifyOTP(context.Context, *VerifyOTPReque
 }
 func (UnimplementedAuthServiceServer) HasPermission(context.Context, *HasPermissionRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method HasPermission not implemented")
+}
+func (UnimplementedAuthServiceServer) ListUserPermissions(context.Context, *ListUserPermissionRequest) (*ListUserPermissionsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListUserPermissions not implemented")
 }
 func (UnimplementedAuthServiceServer) AddUserPermission(context.Context, *model.UserPermission) (*model.UserPermission, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddUserPermission not implemented")
@@ -368,6 +382,24 @@ func _AuthService_HasPermission_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _AuthService_ListUserPermissions_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListUserPermissionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthServiceServer).ListUserPermissions(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.AuthService/ListUserPermissions",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthServiceServer).ListUserPermissions(ctx, req.(*ListUserPermissionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _AuthService_AddUserPermission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(model.UserPermission)
 	if err := dec(in); err != nil {
@@ -478,6 +510,10 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "HasPermission",
 			Handler:    _AuthService_HasPermission_Handler,
+		},
+		{
+			MethodName: "ListUserPermissions",
+			Handler:    _AuthService_ListUserPermissions_Handler,
 		},
 		{
 			MethodName: "AddUserPermission",
