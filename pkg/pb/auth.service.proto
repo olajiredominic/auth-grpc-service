@@ -27,13 +27,15 @@ service AuthService {
   
   rpc HasPermission(HasPermissionRequest) returns (google.protobuf.Empty) { }
   
+  rpc ListUserPermissions(ListUserPermissionRequest) returns (ListUserPermissionsResponse) { }
+  
   rpc AddUserPermission(UserPermission) returns (UserPermission) { }
 
   rpc DeleteUserPermission(UserPermission) returns (google.protobuf.Empty) { }
 
   rpc UpdateUserPermissions(UpdateUserPermissionsRequest) returns (UpdateUserPermissionsResponse) { }
 
-    rpc CheckUserPasswordStatus(CheckUserPasswordStatusRequest) returns (CheckUserPasswordStatusResponse) {}
+  rpc CheckUserPasswordStatus(CheckUserPasswordStatusRequest) returns (CheckUserPasswordStatusResponse) {}
 
 
   //rpc Login(LoginRequest) returns (LoginResponse);
@@ -131,6 +133,16 @@ message HasPermissionRequest {
   // Checks an ID has a certain permission
   string Id = 1;
   string Permission = 2;
+}
+
+message ListUserPermissionRequest {
+  // Checks an ID has a certain permission
+  string UserId = 1;
+}
+
+message ListUserPermissionsResponse {
+  // Checks an ID has a certain permission
+  repeated string Permissions = 1;
 }
 
 message AdduserPermissionRequest {
