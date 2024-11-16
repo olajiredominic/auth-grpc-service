@@ -58,14 +58,28 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 }
 
 func (h *Handler) GetUser(ctx context.Context, req *pb.GetUserRequest) (*models.User, error) {
-
 	var user models.UserORM
-	query := h.DB.First(&user, "id = ?", req.Id)
+
+	// Determine the query condition based on whether ID or Email is provided
+	var query *gorm.DB
+	if req.Id != "" {
+		query = h.DB.First(&user, "id = ?", req.Id)
+	} else if req.Email != "" {
+		query = h.DB.First(&user, "email = ?", req.Email)
+	} else {
+		return nil, status.Errorf(codes.InvalidArgument, "ID or Email must be provided")
+	}
+
+	// Check for query errors
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.NotFound,
-			"User not found")
+		if query.Error == gorm.ErrRecordNotFound {
+			return nil, status.Errorf(codes.NotFound, "User not found")
+		}
+		return nil, status.Errorf(codes.Internal, "Error retrieving user: %v", query.Error)
 	}
+
+	// Map the retrieved user to the response model
 	var createdAt *timestamppb.Timestamp
 	if user.CreatedAt != nil {
 		createdAt = timestamppb.New(*user.CreatedAt)

@@ -61,6 +61,8 @@ func (h *Handler) ForgotPassword(ctx context.Context, req *pb.ForgotPasswordRequ
 
 	// Send email to send token if user is found
 	user.Token = helpers.GetOTP(6, true)
+	now := time.Now()
+	user.UpdatedAt = &now
 
 	h.DB.Save(user)
 
@@ -100,7 +102,7 @@ func (h *Handler) VerifyOTP(ctx context.Context, req *pb.VerifyOTPRequest) (*emp
 	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
 	expired := now.After(expiredTime)
 
-	if (user.Token != req.Token || expired) && req.Token != "123456" {
+	if user.Token != req.Token || expired {
 		log.Println("Invalid OTP", query.Error)
 		return nil, status.Errorf(codes.PermissionDenied,
 			"Invalid or expired authentication token")
@@ -195,7 +197,7 @@ func (h *Handler) LoginUser(ctx context.Context, req *pb.LoginUserRequest) (*pb.
 	}, nil
 }
 
-func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordRequest) (*emptypb.Empty, error) {
+func (h *Handler) ResetPassword(ctx context.Context, req *pb.ResetPasswordRequest) (*emptypb.Empty, error) {
 
 	var user models.UserORM
 	query := h.DB.First(&user, "email = ? OR username = ? OR telephone = ?", req.LoginId, req.LoginId, req.LoginId)
@@ -205,15 +207,10 @@ func (h *Handler) ResetPassword(ctx context.Context, req *pb.UpdatePasswordReque
 			"User not found")
 	}
 
-	now := time.Now()
-	expiredTime := user.UpdatedAt.Add(10 * time.Minute)
-	expired := now.After(expiredTime)
-
-	if (user.Token != req.Token || expired) && req.Token != "123456" {
-		log.Println("Invalid OTP", query.Error)
-		return nil, status.Errorf(codes.PermissionDenied,
-			"Invalid or expired authentication token")
-	}
+	_, err := h.VerifyOTP(ctx, &pb.VerifyOTPRequest{
+		LoginId: req.LoginId,
+		Token:   req.Token,
+	})
 
 	hashPassword, err := helpers.HashPassword(req.Password)
 	if err != nil {

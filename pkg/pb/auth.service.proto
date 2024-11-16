@@ -19,7 +19,7 @@ service AuthService {
 
   rpc ForgotPassword(ForgotPasswordRequest) returns (ForgotPasswordResponse) {}
 
-  rpc ResetPassword(UpdatePasswordRequest) returns (google.protobuf.Empty) {}
+  rpc ResetPassword(ResetPasswordRequest) returns (google.protobuf.Empty) {}
 
   rpc ValidateToken(ValidateTokenRequest) returns (ValidateTokenResponse) { }
   
@@ -50,6 +50,14 @@ message LoginUserRequest {
   string LoginId = 1;
   // The Password
   optional string Password = 2;
+}
+message ResetPasswordRequest {
+  // The Login Id
+  string LoginId = 1 [json_name="loginid"];
+  // The Password
+  string Password = 2 [json_name="password"];
+  string PasswordConfirmation = 3 [json_name="passwordconfirmation"];
+  string Token = 4;
 }
 
 message SocialLoginRequest {
