@@ -331,7 +331,7 @@ func (h *Handler) UpdateUserPermissions(ctx context.Context, req *pb.UpdateUserP
 
 	for _, v := range removed {
 		var permission models.UserPermissionORM
-		h.DB.First(&permission, "user_id = ? OR permission = ? OR status = ?", req.UserId, v, int32(models.Status_INACTIVE))
+		h.DB.First(&permission, "user_id = ? AND permission = ? AND status = ?", req.UserId, v, int32(models.Status_ACTIVE))
 
 		permission.UserId = &req.UserId
 		permission.Permission = v
