@@ -28,7 +28,7 @@ func (h *Handler) CreateUser(ctx context.Context, req *models.User) (*models.Use
 	if checkUser.Error == nil {
 		log.Println("Tried creating user. User exists")
 		return nil, status.Errorf(codes.AlreadyExists,
-			"User exists")
+			"Email or Phone Number alredy exists")
 	}
 
 	req.Id = uuid.New().String()
