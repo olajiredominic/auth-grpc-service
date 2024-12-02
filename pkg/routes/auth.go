@@ -117,8 +117,8 @@ func (h *Handler) HasPermission(ctx context.Context, req *pb.HasPermissionReques
 	query := h.DB.First(&userPermission, "permission = ? AND user_id = ? AND status = ?", req.Permission, req.Id, int32(models.Status_ACTIVE))
 	if query.Error != nil {
 		log.Println(query.Error)
-		return nil, status.Errorf(codes.Unauthenticated,
-			"UnAuthorized")
+		return nil, status.Errorf(codes.PermissionDenied,
+			codes.PermissionDenied.String())
 	}
 
 	return &emptypb.Empty{}, nil
